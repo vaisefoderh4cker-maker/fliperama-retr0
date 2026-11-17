@@ -10,6 +10,7 @@ Não é preciso instalar nada. Basta abrir no navegador (Chrome, Edge ou Firefox
 - **Super Nintendo**: 211 títulos jogáveis direto na página.
 - **Nintendo DS**: você escolhe o seu arquivo `.nds`; o jogo roda no navegador com EmulatorJS e fica guardado apenas nele (IndexedDB).
 - **Sala online**: o anfitrião abre o jogo do próprio arquivo, recebe um **código de 6 caracteres** e transmite a tela para até 3 amigos, que controlam pelo teclado (estilo "Remote Play", conexão ponto a ponto).
+- **Teclas e controle**: na aba DS e na Sala online, o botão **Teclas** permite trocar cada tecla do jogo (salvo no navegador) e controles USB/Bluetooth funcionam como teclado — inclusive no convidado da sala.
 
 ## Como abrir
 
@@ -68,7 +69,21 @@ Detalhes:
 - **Arcade**: setas, `Ctrl`/`Alt` para os botões e `Espaço` para inserir ficha.
 - **Consoles**: setas + `Z`/`X` (e `A`/`S` para os outros botões); `Enter` costuma ser Start.
 - **MS-DOS**: mouse e teclado (clique na tela para capturar o mouse).
-- **Nintendo DS**: mouse/toque na tela de baixo; setas, `Z`/`X`, `A`/`S`, `Enter` (Start), `Shift` (Select).
+- **Nintendo DS**: mouse/toque na tela de baixo; setas, `Z`/`X`, `A`/`S`, `Enter` (Start), `V` (Select).
+
+### Trocar as teclas (DS e Sala online)
+
+1. Clique em **Teclas** (na aba Nintendo DS, na sala como anfitrião ou como convidado).
+2. Em cada ação (Cima, Baixo, A, B, Start...), clique em **Mudar** e pressione a tecla nova. `Esc` cancela.
+3. As teclas ficam salvas neste navegador. **Restaurar padrão** volta tudo ao original.
+
+### Controle USB/Bluetooth
+
+- Conecte o controle e aperte um botão; o painel **Teclas** mostra o nome do controle detectado.
+- Direcional/analógico esquerdo, A/B/X/Y, LB/RB e Start/Select funcionam como as teclas mapeadas — no DS, no anfitrião e também no convidado (o convidado envia os comandos ao anfitrião).
+- Se o controle já responder sozinho dentro do emulador e os comandos saírem duplicados, desmarque **“Usar controle USB/Bluetooth como teclas”**.
+- Controles precisam ser reconhecidos pelo navegador: aperte um botão com a página aberta; no Windows, verifique em `joy.cpl` se o controle aparece.
+- Jogos do acervo (Internet Archive) não usam esse painel: as teclas são controladas pelo player do Archive.
 
 ## Estrutura
 

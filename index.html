@@ -861,7 +861,27 @@
 
   .net-tip b { color: var(--text); }
 
+  /* ---------- teclas e controle ---------- */
+  .ctl-modal { position: fixed; inset: 0; z-index: 120; display: grid; place-items: center; padding: 18px; background: rgba(3, 3, 8, 0.86); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); }
+  .ctl-modal[hidden] { display: none; }
+  .ctl-shell { width: min(620px, 100%); max-height: 92vh; display: flex; flex-direction: column; background: var(--bg-2); border: 1px solid var(--line-strong); border-radius: 16px; overflow: hidden; box-shadow: 0 30px 80px rgba(0, 0, 0, 0.6); }
+  .ctl-head { display: flex; justify-content: space-between; align-items: flex-start; gap: 14px; padding: 16px 18px; border-bottom: 1px solid var(--line); background: var(--panel); }
+  .ctl-head h2 { margin: 0; font-size: 16px; }
+  .ctl-head p { margin: 5px 0 0; color: var(--muted); font-size: 12.5px; line-height: 1.5; max-width: 470px; }
+  .ctl-rows { display: grid; grid-template-columns: 1fr 1fr; gap: 8px 12px; padding: 16px 18px; overflow-y: auto; }
+  .ctl-row { display: flex; align-items: center; gap: 8px; border: 1px solid var(--line); border-radius: 10px; background: var(--panel); padding: 7px 10px; }
+  .ctl-row > span { flex: 1; font-size: 12.5px; color: var(--muted); }
+  .ctl-row kbd { font-family: var(--font-pixel); font-size: 10px; letter-spacing: 1px; color: var(--accent); border: 1px solid var(--line-strong); border-radius: 6px; padding: 4px 7px; background: var(--bg-2); white-space: nowrap; }
+  .ctl-row .btn { height: 30px; padding: 0 9px; font-size: 11.5px; border-radius: 8px; }
+  .ctl-row.capturing { border-color: var(--accent); box-shadow: 0 0 0 2px rgba(0, 229, 255, 0.15); }
+  .ctl-foot { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; padding: 14px 18px; border-top: 1px solid var(--line); background: var(--panel); }
+  .ctl-pad { color: var(--muted); font-size: 12.5px; }
+  .ctl-pad.on { color: var(--accent); }
+  .ctl-check { display: flex; align-items: flex-start; gap: 8px; color: var(--muted); font-size: 12.5px; line-height: 1.45; cursor: pointer; }
+  .ctl-check input { margin-top: 2px; accent-color: var(--accent); }
+
   @media (max-width: 720px) {
+    .ctl-rows { grid-template-columns: 1fr; }
     .wrap { width: calc(100% - 28px); }
     header.hero { padding-top: 28px; }
     .grid { grid-template-columns: repeat(auto-fill, minmax(148px, 1fr)); gap: 10px; }
@@ -999,18 +1019,21 @@
       <p class="ds-note">
         Pokémon Black roda nesta aba: selecione o seu arquivo do jogo (o site não pode incluir o jogo por direitos autorais).
       </p>
+      <button id="dsKeysPicker" class="btn" type="button" style="margin-top:8px">Teclas e controle</button>
     </div>
 
     <div id="dsPlayer" hidden>
       <div class="ds-bar">
         <span>Jogando: <b id="dsGameName">—</b></span>
         <span style="flex:1"></span>
+        <button id="dsKeys" class="btn" type="button">Teclas</button>
         <button id="dsChange" class="btn" type="button">Trocar jogo</button>
       </div>
       <div id="dsScreen" class="ds-screen"></div>
       <p class="ds-note" style="text-align:left;margin:10px 0 0">
-        Mouse ou toque na tela de baixo. Teclado: setas (direcional), <b>Z</b>/<b>X</b> (A/B), <b>A</b>/<b>S</b> (X/Y),
-        <b>Enter</b> (Start), <b>Shift</b> (Select). No menu do emulador ficam tela cheia, saves e controles.
+        Mouse ou toque na tela de baixo. Teclado padrão: setas (direcional), <b>Z</b>/<b>X</b> (A/B), <b>A</b>/<b>S</b> (X/Y),
+        <b>Enter</b> (Start), <b>V</b> (Select). Use o botão <b>Teclas</b> para trocar, ou jogue com um controle
+        USB/Bluetooth — os botões viram essas mesmas teclas.
       </p>
     </div>
   </div>
@@ -1065,6 +1088,7 @@
             <span class="net-code-label">Código</span>
             <b id="netCode" class="net-code">······</b>
             <button id="netCopy" class="btn" type="button">Copiar</button>
+            <button id="netHostKeys" class="btn" type="button">Teclas</button>
             <span style="flex:1"></span>
             <button id="netClose" class="btn" type="button">Encerrar</button>
           </div>
@@ -1072,7 +1096,8 @@
           <p class="net-tip">
             Mande o código para até <b>3 amigos</b>. Um por vez deve usar o controle do <b>jogador 1</b>; para 2
             jogadores simultâneos, mapeie o <b>jogador 2</b> no menu de controles do emulador (engrenagem) para teclas
-            que o convidado vai usar.
+            que o convidado vai usar. O botão <b>Teclas</b> troca as teclas, e controles USB/Bluetooth também funcionam
+            no PC do anfitrião e no de cada convidado.
           </p>
         </div>
       </div>
@@ -1086,15 +1111,45 @@
         <div id="netViewWrap" hidden>
           <div id="netView" class="net-screen" tabindex="0" aria-label="Tela da sala — clique para controlar"></div>
           <button id="netLeave" class="btn" type="button" style="margin-top:10px">Sair da sala</button>
+          <button id="netKeys" class="btn" type="button" style="margin:10px 0 0 8px">Teclas</button>
           <p class="net-tip">
-            Clique na tela para o teclado valer. Teclas: setas, <b>Z</b>/<b>X</b>, <b>A</b>/<b>S</b>, <b>Enter</b>,
-            <b>Shift</b>. Se a imagem não aparecer, o anfitrião ainda está carregando.
+            Clique na tela para o teclado valer. Teclas padrão: setas, <b>Z</b>/<b>X</b>, <b>A</b>/<b>S</b>, <b>Enter</b>,
+            <b>V</b> — use o botão <b>Teclas</b> para trocar. Controle USB/Bluetooth conectado no seu PC também
+            funciona: os botões são enviados ao anfitrião. Se a imagem não aparecer, o anfitrião ainda está carregando.
           </p>
         </div>
       </div>
     </div>
   </div>
 </section>
+
+<div id="ctlModal" class="ctl-modal" hidden role="dialog" aria-modal="true" aria-labelledby="ctlTitle">
+  <div class="ctl-shell">
+    <header class="ctl-head">
+      <div>
+        <h2 id="ctlTitle">Teclas do jogo</h2>
+        <p>
+          Vale para o Nintendo DS e para a Sala online. Clique em <b>Mudar</b> e pressione a tecla nova. Os jogos do
+          acervo abrem no Internet Archive e têm as teclas próprias deles.
+        </p>
+      </div>
+      <button id="ctlCloseBtn" class="close-btn" type="button" aria-label="Fechar">✕</button>
+    </header>
+    <div id="ctlRows" class="ctl-rows"></div>
+    <footer class="ctl-foot">
+      <div style="flex:1 1 100%">
+        <label class="ctl-check">
+          <input id="ctlPadUse" type="checkbox" checked>
+          Usar controle USB/Bluetooth como teclas (desligue se o controle já responder sozinho dentro do emulador).
+        </label>
+        <p id="ctlPad" class="ctl-pad" style="margin:8px 0 0">Nenhum controle detectado.</p>
+      </div>
+      <span style="flex:1"></span>
+      <button id="ctlReset" class="btn" type="button">Restaurar padrão</button>
+      <button id="ctlDone" class="btn primary" type="button">Pronto</button>
+    </footer>
+  </div>
+</div>
 
 <footer>
   <div class="wrap">
@@ -1914,6 +1969,7 @@
       bubbles: true,
       cancelable: true
     });
+    ev.__flpVirtual = true;
     try {
       Object.defineProperty(ev, 'keyCode', { get: function () { return d.keyCode || 0; } });
       Object.defineProperty(ev, 'which', { get: function () { return d.keyCode || 0; } });
@@ -2073,8 +2129,13 @@
 
   function netGuestKey(e, down) {
     if (!netConn || !netConn.open) return;
+    var action = ctlActionFor(e.key);
+    if (!action && ctlKeyMoved(e.key)) return;
+    var info = action
+      ? ctlInfo(CTL_VIRTUAL[action])
+      : { key: e.key, code: e.code, keyCode: e.keyCode || e.which || 0 };
     try {
-      netConn.send({ t: 'k', down: down, key: e.key, code: e.code, keyCode: e.keyCode || e.which || 0 });
+      netConn.send({ t: 'k', down: down, key: info.key, code: info.code, keyCode: info.keyCode });
     } catch (err) {}
   }
 
@@ -2110,6 +2171,348 @@
   netJoinCode.addEventListener('input', function () {
     netJoinCode.value = String(netJoinCode.value || '').toUpperCase().replace(/[^A-Z0-9]/g, '').slice(0, 6);
   });
+
+  /* ---------- teclas remapeáveis e controle USB/Bluetooth ---------- */
+
+  var dsKeys = document.getElementById('dsKeys');
+  var dsKeysPicker = document.getElementById('dsKeysPicker');
+  var netHostKeys = document.getElementById('netHostKeys');
+  var netKeys = document.getElementById('netKeys');
+  var ctlModal = document.getElementById('ctlModal');
+  var ctlRows = document.getElementById('ctlRows');
+  var ctlCloseBtn = document.getElementById('ctlCloseBtn');
+  var ctlDone = document.getElementById('ctlDone');
+  var ctlReset = document.getElementById('ctlReset');
+  var ctlPadStatus = document.getElementById('ctlPad');
+  var ctlPadUse = document.getElementById('ctlPadUse');
+
+  var CTL_ACTIONS = [
+    ['up', 'Cima'], ['down', 'Baixo'], ['left', 'Esquerda'], ['right', 'Direita'],
+    ['a', 'A (botão)'], ['b', 'B (botão)'], ['x', 'X (botão)'], ['y', 'Y (botão)'],
+    ['l', 'L (ombro)'], ['r', 'R (ombro)'], ['start', 'Start'], ['select', 'Select']
+  ];
+  var CTL_VIRTUAL = {
+    up: 'ArrowUp', down: 'ArrowDown', left: 'ArrowLeft', right: 'ArrowRight',
+    a: 'z', b: 'x', x: 'a', y: 's', l: 'q', r: 'e', start: 'Enter', select: 'v'
+  };
+  var CTL_DEFAULT = Object.assign({}, CTL_VIRTUAL);
+  var CTL_STORE = 'fliperama-retro:teclas';
+  var CTL_PAD_STORE = 'fliperama-retro:controle';
+
+  var ctlBindings = ctlLoad();
+  var ctlCapture = '';
+  var ctlPadPrev = {};
+  var ctlLastMode = '';
+
+  function ctlLoad() {
+    var b = {};
+    var k;
+    for (k in CTL_DEFAULT) b[k] = CTL_DEFAULT[k];
+    try {
+      var saved = JSON.parse(localStorage.getItem(CTL_STORE) || 'null');
+      if (saved && typeof saved === 'object') {
+        for (k in saved) {
+          if (CTL_DEFAULT.hasOwnProperty(k) && typeof saved[k] === 'string' && saved[k]) b[k] = saved[k];
+        }
+      }
+    } catch (e) {}
+    return b;
+  }
+
+  function ctlSave() {
+    try { localStorage.setItem(CTL_STORE, JSON.stringify(ctlBindings)); } catch (e) {}
+  }
+
+  function ctlNorm(k) {
+    return typeof k === 'string' && k.length === 1 ? k.toLowerCase() : String(k || '');
+  }
+
+  function ctlLabel(k) {
+    var m = {
+      ArrowUp: '↑', ArrowDown: '↓', ArrowLeft: '←', ArrowRight: '→',
+      ' ': 'Espaço', Enter: 'Enter', Shift: 'Shift', Control: 'Ctrl', Alt: 'Alt',
+      Tab: 'Tab', Backspace: 'Backspace'
+    };
+    if (m[k]) return m[k];
+    return k.length === 1 ? k.toUpperCase() : k;
+  }
+
+  var CTL_CODES = {
+    ArrowUp: 38, ArrowDown: 40, ArrowLeft: 37, ArrowRight: 39, ' ': 32,
+    Enter: 13, Shift: 16, Control: 17, Alt: 18, Tab: 9, Backspace: 8, Escape: 27
+  };
+  var CTL_CODE_NAMES = {
+    ArrowUp: 'ArrowUp', ArrowDown: 'ArrowDown', ArrowLeft: 'ArrowLeft', ArrowRight: 'ArrowRight',
+    ' ': 'Space', Enter: 'Enter', Shift: 'ShiftLeft', Control: 'ControlLeft', Alt: 'AltLeft',
+    Tab: 'Tab', Backspace: 'Backspace', Escape: 'Escape'
+  };
+
+  function ctlKeyCode(k) {
+    return k.length === 1 ? k.toUpperCase().charCodeAt(0) : (CTL_CODES[k] || 0);
+  }
+
+  function ctlCodeName(k) {
+    if (k.length === 1) {
+      if (/[a-z]/i.test(k)) return 'Key' + k.toUpperCase();
+      if (/[0-9]/.test(k)) return 'Digit' + k;
+      return '';
+    }
+    return CTL_CODE_NAMES[k] || k;
+  }
+
+  function ctlInfo(k) {
+    return { key: k, code: ctlCodeName(k), keyCode: ctlKeyCode(k) };
+  }
+
+  function ctlActionFor(key) {
+    var n = ctlNorm(key);
+    for (var id in ctlBindings) {
+      if (ctlNorm(ctlBindings[id]) === n) return id;
+    }
+    return '';
+  }
+
+  function ctlVirtualKeyFor(key) {
+    var n = ctlNorm(key);
+    for (var id in CTL_VIRTUAL) {
+      if (ctlNorm(CTL_VIRTUAL[id]) === n) return id;
+    }
+    return '';
+  }
+
+  function ctlKeyMoved(key) {
+    var id = ctlVirtualKeyFor(key);
+    return !!id && ctlNorm(ctlBindings[id]) !== ctlNorm(CTL_VIRTUAL[id]);
+  }
+
+  function ctlMode() {
+    if (!dsPanel.hidden && !dsPlayer.hidden && document.querySelector('#dsScreen #ejsMount canvas')) return 'ds';
+    if (!netPanel.hidden && netIsHost && !netHostBox.hidden && document.querySelector('#netMount canvas')) return 'host';
+    if (!netPanel.hidden && !netViewWrap.hidden && netConn && netConn.open) return 'guest';
+    return '';
+  }
+
+  function ctlDispatch(action, down) {
+    if (!action || !ctlBindings[action]) return;
+    var mode = ctlMode();
+    if (!mode) return;
+    var info = ctlInfo(CTL_VIRTUAL[action] || ctlBindings[action]);
+    if (mode === 'guest') {
+      if (!netConn || !netConn.open) return;
+      try {
+        netConn.send({ t: 'k', down: down, key: info.key, code: info.code, keyCode: info.keyCode });
+      } catch (e) {}
+      return;
+    }
+    var canvas = document.querySelector(mode === 'ds' ? '#dsScreen canvas' : '#netMount canvas');
+    if (!canvas) return;
+    var ev = new KeyboardEvent(down ? 'keydown' : 'keyup', {
+      key: info.key,
+      code: info.code,
+      bubbles: true,
+      cancelable: true
+    });
+    ev.__flpVirtual = true;
+    try {
+      Object.defineProperty(ev, 'keyCode', { get: function () { return info.keyCode; } });
+      Object.defineProperty(ev, 'which', { get: function () { return info.keyCode; } });
+    } catch (e) {}
+    try { canvas.dispatchEvent(ev); } catch (e) {}
+  }
+
+  function ctlRender() {
+    ctlRows.innerHTML = '';
+    CTL_ACTIONS.forEach(function (a) {
+      var row = document.createElement('div');
+      row.className = 'ctl-row' + (ctlCapture === a[0] ? ' capturing' : '');
+      var label = document.createElement('span');
+      label.textContent = a[1];
+      var kbd = document.createElement('kbd');
+      kbd.textContent = ctlCapture === a[0] ? '…' : ctlLabel(ctlBindings[a[0]]);
+      var btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = 'btn';
+      btn.textContent = ctlCapture === a[0] ? 'Pressione…' : 'Mudar';
+      btn.addEventListener('click', function () {
+        ctlCapture = a[0];
+        ctlRender();
+        ctlCloseBtn.focus();
+      });
+      row.appendChild(label);
+      row.appendChild(kbd);
+      row.appendChild(btn);
+      ctlRows.appendChild(row);
+    });
+  }
+
+  function ctlOpen() {
+    ctlCapture = '';
+    ctlRender();
+    ctlUpdatePad();
+    ctlModal.hidden = false;
+    document.body.style.overflow = 'hidden';
+    ctlCloseBtn.focus();
+  }
+
+  function ctlCloseModal() {
+    ctlCapture = '';
+    ctlModal.hidden = true;
+    document.body.style.overflow = '';
+  }
+
+  function ctlSetKey(action, key) {
+    if (key) {
+      var n = ctlNorm(key);
+      var other = '';
+      for (var id in ctlBindings) {
+        if (id !== action && ctlNorm(ctlBindings[id]) === n) { other = id; break; }
+      }
+      if (other) ctlBindings[other] = ctlBindings[action];
+      ctlBindings[action] = key;
+      ctlSave();
+    }
+    ctlCapture = '';
+    ctlRender();
+  }
+
+  function ctlOnKey(e) {
+    if (e.__flpVirtual) return;
+    if (ctlCapture && e.type === 'keydown') {
+      e.preventDefault();
+      e.stopPropagation();
+      e.stopImmediatePropagation();
+      ctlSetKey(ctlCapture, e.key === 'Escape' ? '' : e.key);
+      return;
+    }
+    if (!ctlModal.hidden) {
+      if (e.type === 'keydown' && e.key === 'Escape') {
+        e.preventDefault();
+        ctlCloseModal();
+      }
+      return;
+    }
+    var mode = ctlMode();
+    if (!mode || mode === 'guest') return;
+    var t = e.target;
+    if (t && t.closest && t.closest('input, select, textarea, button, a, [contenteditable]')) return;
+    var action = ctlActionFor(e.key);
+    if (!action) {
+      if (ctlKeyMoved(e.key)) {
+        e.preventDefault();
+        e.stopPropagation();
+        e.stopImmediatePropagation();
+      }
+      return;
+    }
+    e.preventDefault();
+    e.stopPropagation();
+    e.stopImmediatePropagation();
+    ctlDispatch(action, e.type === 'keydown');
+  }
+
+  function ctlPadList() {
+    if (!navigator.getGamepads) return [];
+    var list = navigator.getGamepads();
+    var out = [];
+    if (!list) return out;
+    for (var i = 0; i < list.length; i++) {
+      if (list[i] && list[i].connected) out.push(list[i]);
+    }
+    return out;
+  }
+
+  function ctlUpdatePad() {
+    var pads = ctlPadList();
+    if (pads.length && ctlPadUse.checked) {
+      ctlPadStatus.textContent = 'Controle conectado: ' + (pads[0].id || 'controle') + ' — botões e direcional viram as teclas acima.';
+      ctlPadStatus.classList.add('on');
+    } else if (pads.length) {
+      ctlPadStatus.textContent = 'Controle conectado, mas “usar como teclas” está desligado.';
+      ctlPadStatus.classList.remove('on');
+    } else {
+      ctlPadStatus.textContent = 'Nenhum controle detectado. Conecte o controle e aperte um botão.';
+      ctlPadStatus.classList.remove('on');
+    }
+  }
+
+  function ctlPadState(pad) {
+    var b = pad.buttons || [];
+    var ax = pad.axes || [];
+    function on(i) { return !!(b[i] && (b[i].pressed || b[i].value > 0.5)); }
+    var dead = 0.45;
+    var x = ax.length ? ax[0] : 0;
+    var y = ax.length > 1 ? ax[1] : 0;
+    return {
+      up: on(12) || y < -dead,
+      down: on(13) || y > dead,
+      left: on(14) || x < -dead,
+      right: on(15) || x > dead,
+      a: on(0), b: on(1), x: on(2), y: on(3),
+      l: on(4) || on(6), r: on(5) || on(7),
+      select: on(8), start: on(9)
+    };
+  }
+
+  function ctlPadTick() {
+    var mode = ctlMode();
+    var pads = (mode && ctlModal.hidden && ctlPadUse.checked) ? ctlPadList() : [];
+    if (!pads.length) {
+      for (var id in ctlPadPrev) {
+        if (ctlPadPrev[id]) ctlDispatch(id, false);
+      }
+      ctlPadPrev = {};
+      ctlLastMode = mode;
+      return;
+    }
+    if (mode !== ctlLastMode) {
+      ctlPadPrev = {};
+      ctlLastMode = mode;
+    }
+    var st = ctlPadState(pads[0]);
+    for (var i = 0; i < CTL_ACTIONS.length; i++) {
+      var act = CTL_ACTIONS[i][0];
+      var now = !!st[act];
+      if (now !== !!ctlPadPrev[act]) ctlDispatch(act, now);
+    }
+    ctlPadPrev = st;
+  }
+
+  try { ctlPadUse.checked = localStorage.getItem(CTL_PAD_STORE) !== '0'; } catch (e) { ctlPadUse.checked = true; }
+
+  ctlPadUse.addEventListener('change', function () {
+    try { localStorage.setItem(CTL_PAD_STORE, ctlPadUse.checked ? '1' : '0'); } catch (e) {}
+    ctlPadPrev = {};
+    ctlUpdatePad();
+  });
+
+  window.addEventListener('gamepadconnected', function () {
+    ctlPadPrev = {};
+    ctlUpdatePad();
+  });
+  window.addEventListener('gamepaddisconnected', function () {
+    ctlPadPrev = {};
+    ctlUpdatePad();
+  });
+
+  window.addEventListener('keydown', ctlOnKey, true);
+  window.addEventListener('keyup', ctlOnKey, true);
+
+  dsKeys.addEventListener('click', ctlOpen);
+  dsKeysPicker.addEventListener('click', ctlOpen);
+  netHostKeys.addEventListener('click', ctlOpen);
+  netKeys.addEventListener('click', ctlOpen);
+  ctlCloseBtn.addEventListener('click', ctlCloseModal);
+  ctlDone.addEventListener('click', ctlCloseModal);
+  ctlModal.addEventListener('click', function (e) { if (e.target === ctlModal) ctlCloseModal(); });
+  ctlReset.addEventListener('click', function () {
+    ctlBindings = {};
+    for (var k in CTL_DEFAULT) ctlBindings[k] = CTL_DEFAULT[k];
+    ctlSave();
+    ctlCapture = '';
+    ctlRender();
+  });
+
+  setInterval(ctlPadTick, 50);
 
   window.addEventListener('beforeunload', function () {
     el.frame.src = '';
