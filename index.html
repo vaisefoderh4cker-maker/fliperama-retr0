@@ -260,16 +260,84 @@
 
   /* ---------- platform chips ---------- */
 
-  .chips {
+  .plat-picker { padding-top: 12px; }
+
+  .plat-head {
     display: flex;
-    gap: 8px;
-    overflow-x: auto;
-    padding: 12px 0 4px;
-    scrollbar-width: none;
-    -ms-overflow-style: none;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
   }
 
-  .chips::-webkit-scrollbar { display: none; }
+  .plat-label {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+
+  .plat-more {
+    border: 0;
+    background: none;
+    color: var(--accent);
+    font-size: 12px;
+    font-weight: 600;
+    padding: 4px 0;
+    cursor: pointer;
+  }
+
+  .plat-more:hover { text-decoration: underline; }
+
+  .chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    padding: 8px 0 4px;
+  }
+
+  .plat-all {
+    margin-top: 6px;
+    padding: 4px 14px 14px;
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    background: var(--panel);
+  }
+
+  .plat-all[hidden] { display: none; }
+
+  .plat-group { padding-top: 10px; }
+
+  .plat-group + .plat-group {
+    border-top: 1px solid var(--line);
+    margin-top: 10px;
+  }
+
+  .plat-group-name {
+    display: block;
+    margin-bottom: 6px;
+    font-size: 10.5px;
+    letter-spacing: 1.3px;
+    text-transform: uppercase;
+    color: #8f8fb0;
+  }
+
+  .plat-group .chips { padding: 0; }
+
+  .plat-note {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+    margin: 10px 0 0;
+    font-size: 12.5px;
+    line-height: 1.5;
+    color: var(--muted);
+  }
+
+  .plat-note b { color: var(--text); }
+
+  .plat-note .btn { height: 30px; padding: 0 12px; font-size: 12px; border-radius: 8px; }
 
   .chip {
     flex: 0 0 auto;
@@ -785,6 +853,77 @@
 
   .ds-screen > div { width: 100%; height: 100%; }
 
+  /* ---------- meus jogos ---------- */
+
+  .meu { padding: 26px 0 56px; }
+
+  .meu-brand {
+    margin: 26px 0 0;
+    font-size: 11.5px;
+    font-weight: 700;
+    letter-spacing: 1.4px;
+    text-transform: uppercase;
+    color: var(--accent);
+  }
+
+  .meu-brand:first-of-type { margin-top: 6px; }
+
+  .meu-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
+    gap: 12px;
+    margin-top: 10px;
+  }
+
+  .meu-sys {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    border: 1px solid var(--line-strong);
+    border-radius: var(--radius);
+    background: var(--panel);
+    padding: 14px 16px;
+  }
+
+  .meu-sys h3 { margin: 0; font-size: 14.5px; }
+
+  .meu-sys p {
+    margin: 0;
+    color: var(--muted);
+    font-size: 12px;
+    line-height: 1.5;
+    flex: 1;
+  }
+
+  .meu-sys .btn { width: 100%; justify-content: center; }
+
+  .meu-sys.off { opacity: 0.7; }
+
+  .meu-sys.off .btn { cursor: default; }
+
+  .meu-tags { display: flex; gap: 6px; flex-wrap: wrap; }
+
+  .meu-tag {
+    font-size: 10.5px;
+    color: var(--muted);
+    border: 1px solid var(--line);
+    border-radius: 999px;
+    padding: 2px 8px;
+  }
+
+  .meu-screen {
+    width: 100%;
+    height: min(78vh, 640px);
+    background: #000;
+    border: 1px solid var(--line-strong);
+    border-radius: var(--radius);
+    overflow: hidden;
+  }
+
+  .meu-screen > div { width: 100%; height: 100%; }
+
+  .meu-screen canvas { max-width: 100%; max-height: 100%; }
+
   /* ---------- sala online ---------- */
 
   .net { padding: 26px 0 56px; }
@@ -945,6 +1084,7 @@
         <li><b>MS-DOS</b>: mouse e teclado. Clique na tela para capturar o mouse; use o menu do player para tela cheia.</li>
         <li>Use o botão de <b>tela cheia</b> do próprio player para jogar em tela grande.</li>
         <li><b>Nintendo DS</b>: use a aba <b>Nintendo DS</b> e escolha o seu arquivo <b>.nds</b> — o jogo roda no seu navegador, sem upload.</li>
+        <li><b>Meus jogos</b>: na aba <b>Meus jogos</b> você roda arquivos seus de PlayStation 1, Nintendo 64, NES, SNES, Game Boy/GBA, Mega Drive e outros — também sem upload. Catálogos comerciais de PlayStation, Xbox e Nintendo não podem ser incluídos por direitos autorais; no Xbox, use o console ou o serviço oficial.</li>
         <li><b>Sala online</b>: na aba <b>Sala online</b> o anfitrião abre o jogo do próprio arquivo, recebe um <b>código de 6 caracteres</b> e os amigos entram com esse código para jogar junto.</li>
       </ul>
     </details>
@@ -953,6 +1093,7 @@
 
 <nav class="tabs wrap" role="tablist" aria-label="Seções do site">
   <button class="tab active" id="tabAcervo" type="button" role="tab" aria-selected="true" aria-controls="acervoPanel">Acervo</button>
+  <button class="tab" id="tabMeu" type="button" role="tab" aria-selected="false" aria-controls="meuPanel">Meus jogos</button>
   <button class="tab" id="tabDs" type="button" role="tab" aria-selected="false" aria-controls="dsPanel">Nintendo DS</button>
   <button class="tab" id="tabNet" type="button" role="tab" aria-selected="false" aria-controls="netPanel">Sala online</button>
 </nav>
@@ -991,7 +1132,22 @@
       </button>
     </div>
 
-    <nav class="chips" id="chips" aria-label="Filtrar por plataforma"></nav>
+    <div class="plat-picker">
+      <div class="plat-head">
+        <span class="plat-label">Plataformas</span>
+        <button id="platMore" class="plat-more" type="button" aria-expanded="false" aria-controls="platAll">Ver todas as plataformas</button>
+      </div>
+      <nav class="chips" id="chips" aria-label="Filtrar por plataforma"></nav>
+      <div id="platAll" class="plat-all" hidden></div>
+      <p class="plat-note">
+        <span>
+          <b>PlayStation, Xbox e Nintendo</b>: os jogos comerciais são protegidos por direitos autorais e não podem
+          entrar no site. Para rodar <b>os seus próprios arquivos</b> (PS1, Nintendo 64, NES, SNES, Game Boy, GBA…), use
+          a aba <b>Meus jogos</b>.
+        </span>
+        <button id="platMeu" class="btn" type="button">Abrir Meus jogos</button>
+      </p>
+    </div>
   </div>
 </div>
 
@@ -1011,6 +1167,44 @@
 </main>
 
 </div>
+
+<section id="meuPanel" class="meu" role="tabpanel" aria-labelledby="tabMeu" hidden>
+  <div class="wrap">
+    <div class="ds-head">
+      <h2>Meus jogos no navegador</h2>
+      <p>
+        Jogue aqui os arquivos que <b>você já tem</b> no computador: PlayStation 1, Nintendo 64, NES, Super Nintendo,
+        Game Boy/GBC, Game Boy Advance, Mega Drive, Master System, Game Gear, Atari, PC Engine e outros. O arquivo
+        <b>não é enviado nem guardado</b> em lugar nenhum — ele roda só nesta aba do navegador.
+      </p>
+      <p class="ds-note" style="text-align:left;margin:-8px 0 14px">
+        Por direitos autorais, o site não pode incluir os catálogos comerciais de PlayStation, Xbox e Nintendo.
+        O uso legal é rodar uma cópia feita do <b>seu próprio jogo</b>. Xbox (e PlayStation 2 em diante) não roda no
+        navegador — para esses, use o console ou o serviço oficial.
+      </p>
+    </div>
+
+    <div id="meuPicker">
+      <div id="meuSystems"></div>
+    </div>
+
+    <div id="meuPlayer" hidden>
+      <div class="ds-bar">
+        <span>Jogando: <b id="meuName">—</b></span>
+        <span style="flex:1"></span>
+        <button id="meuKeys" class="btn" type="button">Teclas</button>
+        <button id="meuChange" class="btn" type="button">Trocar jogo</button>
+      </div>
+      <div id="meuScreen" class="meu-screen"></div>
+      <p class="ds-note" style="text-align:left;margin:10px 0 0">
+        Clique dentro da tela para o teclado valer. Use o botão <b>Teclas</b> para trocar as teclas, ou o menu de
+        opções do emulador (engrenagem) para tela cheia, save state e controle USB/Bluetooth.
+      </p>
+    </div>
+
+    <input id="meuFile" type="file" hidden>
+  </div>
+</section>
 
 <section id="dsPanel" class="ds" role="tabpanel" aria-labelledby="tabDs" hidden>
   <div class="wrap">
@@ -1150,8 +1344,8 @@
       <div>
         <h2 id="ctlTitle">Teclas do jogo</h2>
         <p>
-          Vale para o Nintendo DS, a Sala online e todos os jogos do acervo que rodam no site. Clique em
-          <b>Mudar</b> e pressione a tecla nova. Jogos abertos no player do Archive (sem o modo do site) têm teclas fixas.
+          Vale para o Nintendo DS, a Sala online, a aba Meus jogos e todos os jogos do acervo que rodam no site. Clique
+          em <b>Mudar</b> e pressione a tecla nova. Jogos abertos no player do Archive (sem o modo do site) têm teclas fixas.
         </p>
       </div>
       <button id="ctlCloseBtn" class="close-btn" type="button" aria-label="Fechar">✕</button>
@@ -1179,6 +1373,7 @@
     No <b>modo do site</b>, o emulador roda na própria página para você poder trocar as teclas; nenhum jogo é guardado aqui.<br>
     Para abrir o jogo em outra aba ou ver detalhes, use “Abrir no Archive.org” dentro do player.<br>
     Na aba <b>Nintendo DS</b>, o arquivo escolhido por você roda localmente no navegador e não é enviado a lugar nenhum.<br>
+    Na aba <b>Meus jogos</b>, os arquivos que você já tem (PS1, Nintendo 64, NES, SNES, Game Boy, Mega Drive…) também rodam só no seu navegador — nada é enviado nem guardado.<br>
     Na aba <b>Sala online</b>, a imagem vai direto do PC do anfitrião para os amigos (conexão ponto a ponto); nada é gravado nem hospedado.
   </div>
 </footer>
@@ -1259,6 +1454,9 @@
     q: document.getElementById('q'),
     sort: document.getElementById('sort'),
     chips: document.getElementById('chips'),
+    platAll: document.getElementById('platAll'),
+    platMore: document.getElementById('platMore'),
+    platMeu: document.getElementById('platMeu'),
     grid: document.getElementById('grid'),
     sentinel: document.getElementById('sentinel'),
     empty: document.getElementById('empty'),
@@ -1349,23 +1547,106 @@
       state.platform = value;
       if (value !== 'all') state.favOnly = false;
       el.favBtn.setAttribute('aria-pressed', String(state.favOnly));
+      setPlatOpen(false);
       refresh();
     });
     return b;
   }
 
-  var allChip = chip('Todos', CAT.total, 'all', null);
-  allChip.classList.add('active');
-  el.chips.appendChild(allChip);
+  var quickIds = {};
+  var extraChip = null;
 
-  PLAT.forEach(function (p) {
-    el.chips.appendChild(chip(p.nome, p.n, p.id, PLAT_COLOR[p.id] || '#00e5ff'));
+  (function buildQuick() {
+    var allChip = chip('Todos', CAT.total, 'all', null);
+    allChip.classList.add('active');
+    el.chips.appendChild(allChip);
+
+    ['genesis', 'msdos', 'arcade', 'atari2600', 'snes'].forEach(function (id) {
+      var p = PLAT.find(function (x) { return x.id === id; });
+      if (!p || quickIds[p.id]) return;
+      quickIds[p.id] = true;
+      el.chips.appendChild(chip(p.nome, p.n, p.id, PLAT_COLOR[p.id] || '#00e5ff'));
+    });
+  })();
+
+  var PLAT_BRANDS = [
+    ['Fliperama e computador', ['arcade', 'msdos']],
+    ['Nintendo', ['snes']],
+    ['Sega', ['genesis']],
+    ['Atari', ['atari2600', 'atari5200', 'atari7800', 'lynx']],
+    ['NEC', ['tg16']],
+    ['Bandai', ['wonderswan']],
+    ['Coleco', ['coleco']],
+    ['Outras plataformas', []]
+  ];
+
+  (function buildPlatAll() {
+    var used = {};
+    var rest = [];
+    PLAT_BRANDS.forEach(function (b) {
+      b[1].forEach(function (id) {
+        if (PLAT.some(function (p) { return p.id === id; })) used[id] = true;
+      });
+    });
+    rest = PLAT.filter(function (p) { return !used[p.id]; });
+
+    PLAT_BRANDS.forEach(function (b, bi) {
+      var items = b[1].map(function (id) {
+        return PLAT.find(function (p) { return p.id === id; });
+      }).filter(Boolean);
+      if (bi === PLAT_BRANDS.length - 1) items = items.concat(rest);
+      if (!items.length) return;
+
+      var box = document.createElement('div');
+      box.className = 'plat-group';
+      var name = document.createElement('span');
+      name.className = 'plat-group-name';
+      name.textContent = b[0];
+      box.appendChild(name);
+
+      var nav = document.createElement('nav');
+      nav.className = 'chips';
+      nav.setAttribute('aria-label', 'Plataformas — ' + b[0]);
+      items.forEach(function (p) {
+        nav.appendChild(chip(p.nome, p.n, p.id, PLAT_COLOR[p.id] || '#00e5ff'));
+      });
+      box.appendChild(nav);
+      el.platAll.appendChild(box);
+    });
+  })();
+
+  function setPlatOpen(open) {
+    el.platAll.hidden = !open;
+    el.platMore.setAttribute('aria-expanded', String(open));
+    el.platMore.textContent = open ? 'Mostrar menos' : 'Ver todas as plataformas';
+  }
+
+  el.platMore.addEventListener('click', function () {
+    setPlatOpen(el.platAll.hidden);
   });
 
+  el.platMeu.addEventListener('click', function () { showTab('meu'); });
+
   function syncChips() {
-    Array.prototype.forEach.call(el.chips.children, function (c) {
-      c.classList.toggle('active', !state.favOnly && c.dataset.value === state.platform);
-      if (c.dataset.value !== 'all' && c.dataset.value === state.platform) {
+    if (state.platform !== 'all' && !quickIds[state.platform]) {
+      var p = PLAT.find(function (x) { return x.id === state.platform; });
+      if (!extraChip) {
+        extraChip = chip('', 0, state.platform, PLAT_COLOR[state.platform] || '#00e5ff');
+        el.chips.appendChild(extraChip);
+      }
+      extraChip.firstChild.nodeValue = p ? p.nome : state.platform;
+      extraChip.querySelector('.n').textContent = fmt(p ? p.n : 0);
+      extraChip.hidden = false;
+    } else if (extraChip) {
+      extraChip.hidden = true;
+    }
+
+    var active = state.favOnly ? '' : state.platform;
+    var nodes = document.querySelectorAll('#chips .chip, #platAll .chip');
+    Array.prototype.forEach.call(nodes, function (c) {
+      var on = c.dataset.value === active;
+      c.classList.toggle('active', on);
+      if (c.dataset.value !== 'all' && on) {
         c.style.background = PLAT_COLOR[c.dataset.value] || '#fff';
         c.style.borderColor = c.style.background;
         c.style.color = '#05050b';
@@ -1743,9 +2024,11 @@
   /* ---------- abas e Nintendo DS ---------- */
 
   var tabAcervo = document.getElementById('tabAcervo');
+  var tabMeu = document.getElementById('tabMeu');
   var tabDs = document.getElementById('tabDs');
   var tabNet = document.getElementById('tabNet');
   var acervoPanel = document.getElementById('acervoPanel');
+  var meuPanel = document.getElementById('meuPanel');
   var dsPanel = document.getElementById('dsPanel');
   var netPanel = document.getElementById('netPanel');
   var dsFile = document.getElementById('dsFile');
@@ -1765,22 +2048,29 @@
 
   function showTab(name) {
     var isAcervo = name === 'acervo';
+    var isMeu = name === 'meu';
     var isDs = name === 'ds';
     var isNet = name === 'net';
     tabAcervo.classList.toggle('active', isAcervo);
+    tabMeu.classList.toggle('active', isMeu);
     tabDs.classList.toggle('active', isDs);
     tabNet.classList.toggle('active', isNet);
     tabAcervo.setAttribute('aria-selected', String(isAcervo));
+    tabMeu.setAttribute('aria-selected', String(isMeu));
     tabDs.setAttribute('aria-selected', String(isDs));
     tabNet.setAttribute('aria-selected', String(isNet));
     acervoPanel.hidden = !isAcervo;
+    meuPanel.hidden = !isMeu;
     dsPanel.hidden = !isDs;
     netPanel.hidden = !isNet;
+    if (!isMeu) meuStop();
+    if (!isDs) dsStop();
     if (isDs) loadDsSaved();
     window.scrollTo(0, 0);
   }
 
   tabAcervo.addEventListener('click', function () { showTab('acervo'); });
+  tabMeu.addEventListener('click', function () { showTab('meu'); });
   tabDs.addEventListener('click', function () { showTab('ds'); });
   tabNet.addEventListener('click', function () { showTab('net'); });
 
@@ -1791,6 +2081,7 @@
 
   function dsBoot(blob, name) {
     if (netIsHost) netStopHost();
+    if (!meuPlayer.hidden) meuStop();
     if (dsUrl) URL.revokeObjectURL(dsUrl);
     dsUrl = URL.createObjectURL(blob);
     dsGameName.textContent = name;
@@ -1823,6 +2114,152 @@
     dsPicker.hidden = false;
     if (dsUrl) { URL.revokeObjectURL(dsUrl); dsUrl = null; }
   }
+
+  /* ---------- meus jogos (arquivos do próprio usuário) ---------- */
+
+  var MEU_SYSTEMS = [
+    { brand: 'Nintendo', nome: 'NES / Famicom', core: 'nes', exts: ['nes', 'unf', 'fds', 'zip'], nota: 'Setas + Z/X (A/B), Enter (Start), V (Select).' },
+    { brand: 'Nintendo', nome: 'Super Nintendo', core: 'snes', exts: ['sfc', 'smc', 'fig', 'swc', 'zip'], nota: 'Setas + Z/X (A/B), A/S (X/Y), Q/E (L/R), Enter/V.' },
+    { brand: 'Nintendo', nome: 'Nintendo 64', core: 'n64', exts: ['n64', 'z64', 'v64', 'zip'], nota: 'Use o teclado ou um controle USB/Bluetooth no menu de opções do emulador.' },
+    { brand: 'Nintendo', nome: 'Game Boy / Game Boy Color', core: 'gb', exts: ['gb', 'gbc', 'zip'], nota: 'Setas + Z/X, Enter (Start), V (Select).' },
+    { brand: 'Nintendo', nome: 'Game Boy Advance', core: 'gba', exts: ['gba', 'zip'], nota: 'Setas + Z/X (A/B), A/S (L/R), Enter/V.' },
+    { brand: 'Nintendo', nome: 'Nintendo DS', exts: ['nds', 'zip'], nota: 'Tem aba própria: use a aba Nintendo DS (o arquivo fica guardado no navegador).' },
+    { brand: 'PlayStation', nome: 'PlayStation 1', core: 'psx', exts: ['bin', 'cue', 'iso', 'chd', 'm3u', 'zip'], nota: 'Escolha o .cue quando existir. A maioria dos jogos roda sem BIOS.' },
+    { brand: 'PlayStation', nome: 'PlayStation 2, 3, 4 e 5', off: true, nota: 'Não roda no navegador. Jogue no console ou no serviço oficial (PlayStation Store / PS Plus).' },
+    { brand: 'Xbox', nome: 'Xbox, Xbox 360 e Xbox One/Series', off: true, nota: 'Xbox não roda no navegador. Jogue no console ou no serviço oficial (Microsoft Store / Game Pass).' },
+    { brand: 'Sega', nome: 'Mega Drive / Genesis', core: 'segaMD', exts: ['md', 'gen', 'smd', 'bin', 'zip'], nota: 'Setas + Z/X/A/S, Enter (Start).' },
+    { brand: 'Sega', nome: 'Master System', core: 'segaMS', exts: ['sms', 'zip'], nota: 'Setas + Z/X (1/2), Enter (Start).' },
+    { brand: 'Sega', nome: 'Game Gear', core: 'segaGG', exts: ['gg', 'zip'], nota: 'Setas + Z/X (1/2), Enter (Start).' },
+    { brand: 'Atari', nome: 'Atari 2600', core: 'atari2600', exts: ['a26', 'bin', 'zip'], nota: 'Setas + Z (botão), V (Select), Enter (Start).' },
+    { brand: 'Atari', nome: 'Atari 7800', core: 'atari7800', exts: ['a78', 'bin', 'zip'], nota: 'Setas + Z/X (botões), Enter/V.' },
+    { brand: 'Atari', nome: 'Atari Lynx', core: 'lynx', exts: ['lnx', 'zip'], nota: 'Setas + Z/X, Enter/V.' },
+    { brand: 'Outros', nome: 'PC Engine / TurboGrafx-16', core: 'pce', exts: ['pce', 'zip'], nota: 'Setas + Z/X (I/II), Enter (Run), V (Select).' },
+    { brand: 'Outros', nome: 'WonderSwan', core: 'ws', exts: ['ws', 'wsc', 'zip'], nota: 'Setas + Z/X, Enter (Start).' },
+    { brand: 'Outros', nome: 'Neo Geo Pocket / Color', core: 'ngp', exts: ['ngp', 'ngc', 'zip'], nota: 'Setas + Z/X, Enter (Start).' },
+    { brand: 'Outros', nome: 'Virtual Boy', core: 'vb', exts: ['vb', 'zip'], nota: 'Setas + Z/X, Enter/V.' },
+    { brand: 'Outros', nome: 'Arcade (FBNeo)', core: 'arcade', exts: ['zip'], nota: 'Use o zip do jogo arcade. V insere ficha; Enter é Start.' }
+  ];
+
+  var meuSystems = document.getElementById('meuSystems');
+  var meuPicker = document.getElementById('meuPicker');
+  var meuPlayer = document.getElementById('meuPlayer');
+  var meuScreen = document.getElementById('meuScreen');
+  var meuName = document.getElementById('meuName');
+  var meuFile = document.getElementById('meuFile');
+  var meuChange = document.getElementById('meuChange');
+  var meuKeys = document.getElementById('meuKeys');
+  var meuPending = null;
+  var meuUrl = null;
+
+  (function renderMeuSystems() {
+    MEU_SYSTEMS.reduce(function (brands, s) {
+      if (brands.indexOf(s.brand) === -1) brands.push(s.brand);
+      return brands;
+    }, []).forEach(function (brand) {
+      var systems = MEU_SYSTEMS.filter(function (s) { return s.brand === brand; });
+      if (!systems.length) return;
+
+      var title = document.createElement('h3');
+      title.className = 'meu-brand';
+      title.textContent = brand;
+      meuSystems.appendChild(title);
+
+      var grid = document.createElement('div');
+      grid.className = 'meu-grid';
+
+      systems.forEach(function (s) {
+        var card = document.createElement('div');
+        card.className = 'meu-sys' + (s.off ? ' off' : '');
+
+        var h = document.createElement('h3');
+        h.textContent = s.nome;
+        card.appendChild(h);
+
+        var p = document.createElement('p');
+        p.textContent = s.nota;
+        card.appendChild(p);
+
+        if (s.exts) {
+          var tags = document.createElement('div');
+          tags.className = 'meu-tags';
+          s.exts.forEach(function (ext) {
+            var t = document.createElement('span');
+            t.className = 'meu-tag';
+            t.textContent = '.' + ext;
+            tags.appendChild(t);
+          });
+          card.appendChild(tags);
+
+          var b = document.createElement('button');
+          b.type = 'button';
+          b.className = 'btn';
+          b.textContent = 'Escolher arquivo';
+          b.addEventListener('click', function () {
+            meuPending = s;
+            meuFile.value = '';
+            meuFile.setAttribute('accept', s.exts.map(function (e) { return '.' + e; }).join(','));
+            meuFile.click();
+          });
+          card.appendChild(b);
+        } else {
+          var off = document.createElement('button');
+          off.type = 'button';
+          off.className = 'btn';
+          off.disabled = true;
+          off.textContent = 'Não roda no navegador';
+          card.appendChild(off);
+        }
+
+        grid.appendChild(card);
+      });
+
+      meuSystems.appendChild(grid);
+    });
+  })();
+
+  function meuStop() {
+    if (window.EJS_emulator && window.EJS_emulator.pause) {
+      try { window.EJS_emulator.pause(); } catch (e) {}
+    }
+    meuScreen.innerHTML = '';
+    meuPlayer.hidden = true;
+    meuPicker.hidden = false;
+    if (meuUrl) { URL.revokeObjectURL(meuUrl); meuUrl = null; }
+  }
+
+  function meuBoot(file, sys) {
+    if (netIsHost) netStopHost();
+    if (!dsPlayer.hidden) dsStop();
+    if (meuUrl) URL.revokeObjectURL(meuUrl);
+    meuUrl = URL.createObjectURL(file);
+    meuName.textContent = file.name || sys.nome;
+    meuPicker.hidden = true;
+    meuPlayer.hidden = false;
+    meuScreen.innerHTML = '';
+    var mount = document.createElement('div');
+    mount.id = 'meuMount';
+    meuScreen.appendChild(mount);
+    window.EJS_player = '#meuMount';
+    window.EJS_core = sys.core;
+    window.EJS_gameUrl = meuUrl;
+    window.EJS_gameName = String(file.name || 'jogo').replace(/\.[^.]+$/, '');
+    window.EJS_pathtodata = 'https://cdn.emulatorjs.org/stable/data/';
+    window.EJS_language = 'pt-BR';
+    window.EJS_startOnLoaded = true;
+    var s = document.createElement('script');
+    s.src = 'https://cdn.emulatorjs.org/stable/data/loader.js';
+    s.onerror = function () {
+      mount.innerHTML = '<p style="padding:20px;color:#ff8787">Não foi possível carregar o emulador. Verifique a internet e tente de novo.</p>';
+    };
+    document.body.appendChild(s);
+  }
+
+  meuFile.addEventListener('change', function () {
+    var f = meuFile.files && meuFile.files[0];
+    if (f && meuPending) meuBoot(f, meuPending);
+  });
+
+  meuChange.addEventListener('click', function () { meuStop(); });
 
   /* o arquivo escolhido fica guardado só neste navegador (IndexedDB) */
 
@@ -2156,6 +2593,7 @@
       return;
     }
     if (!dsPlayer.hidden) dsStop();
+    if (!meuPlayer.hidden) meuStop();
     netIsHost = true;
     netCreate.disabled = true;
     netHostBox.hidden = false;
@@ -2410,6 +2848,7 @@
 
   function ctlMode() {
     if (siteActive) return 'site';
+    if (!meuPanel.hidden && !meuPlayer.hidden && document.querySelector('#meuScreen #meuMount canvas')) return 'meu';
     if (!dsPanel.hidden && !dsPlayer.hidden && document.querySelector('#dsScreen #ejsMount canvas')) return 'ds';
     if (!netPanel.hidden && netIsHost && !netHostBox.hidden && document.querySelector('#netMount canvas')) return 'host';
     if (!netPanel.hidden && !netViewWrap.hidden && netConn && netConn.open) return 'guest';
@@ -2429,7 +2868,7 @@
       } catch (e) {}
       return;
     }
-    var canvas = document.querySelector(mode === 'ds' ? '#dsScreen canvas' : '#netMount canvas');
+    var canvas = document.querySelector(mode === 'ds' ? '#dsScreen canvas' : mode === 'meu' ? '#meuScreen canvas' : '#netMount canvas');
     if (!canvas) return;
     var ev = new KeyboardEvent(down ? 'keydown' : 'keyup', {
       key: info.key,
@@ -2635,6 +3074,7 @@
 
   dsKeys.addEventListener('click', ctlOpen);
   dsKeysPicker.addEventListener('click', ctlOpen);
+  meuKeys.addEventListener('click', ctlOpen);
   netHostKeys.addEventListener('click', ctlOpen);
   netKeys.addEventListener('click', ctlOpen);
   el.playerKeys.addEventListener('click', ctlOpen);

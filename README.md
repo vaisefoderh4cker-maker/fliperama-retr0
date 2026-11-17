@@ -1,16 +1,18 @@
 # Fliperama Retrô
 
-Página local para jogar clássicos no navegador: catálogo com **29.369 jogos** de **18 plataformas** (Arcade, MS-DOS, Mega Drive, Super Nintendo, Atari 2600/5200/7800, TurboGrafx-16, ColecoVision, WonderSwan e mais), player do Internet Archive, aba de **Nintendo DS** com arquivo próprio e **sala online com código** para jogar junto.
+Página local para jogar clássicos no navegador: catálogo com **29.369 jogos** de **18 plataformas** (Arcade, MS-DOS, Mega Drive, Super Nintendo, Atari 2600/5200/7800, TurboGrafx-16, ColecoVision, WonderSwan e mais), player do Internet Archive, aba de **Nintendo DS** e **Meus jogos** (arquivos seus de PS1, Nintendo 64, NES, SNES, Game Boy, GBA, Mega Drive…) e **sala online com código** para jogar junto.
 
 Não é preciso instalar nada. Basta abrir no navegador (Chrome, Edge ou Firefox atualizados) e ter internet para o acervo.
 
 ## Recursos
 
 - **Acervo**: 29.369 jogos emulados na hora pelo Internet Archive, com capa, busca, filtro por plataforma, ordenação e favoritos.
+- **Seleção de plataforma**: chips rápidos das plataformas mais usadas e o botão **Ver todas as plataformas**, que abre a lista completa agrupada por fabricante (Fliperama/PC, Nintendo, Sega, Atari, NEC, Bandai, Coleco e outras).
 - **Super Nintendo**: 211 títulos jogáveis direto na página.
+- **Meus jogos**: rode no navegador os arquivos que você já tem — PlayStation 1, Nintendo 64, NES, SNES, Game Boy/GBC, Game Boy Advance, Mega Drive, Master System, Game Gear, Atari, PC Engine, Neo Geo Pocket, Virtual Boy e Arcade. Nada é enviado nem guardado (o arquivo só fica na memória da aba). Xbox e PlayStation 2 em diante não rodam no navegador.
 - **Nintendo DS**: você escolhe o seu arquivo `.nds`; o jogo roda no navegador com EmulatorJS e fica guardado apenas nele (IndexedDB).
 - **Sala online**: o anfitrião abre o jogo do próprio arquivo, recebe um **código de 6 caracteres** e transmite a tela para até 3 amigos, que controlam pelo teclado (estilo "Remote Play", conexão ponto a ponto).
-- **Teclas em qualquer jogo**: o botão **Teclas** troca cada tecla do jogo — vale para o Nintendo DS, a Sala online **e todos os jogos do acervo** que rodam no modo do site (Arcade, Mega Drive, Super Nintendo, Atari 2600/5200/7800, TurboGrafx-16, WonderSwan e Lynx).
+- **Teclas em qualquer jogo**: o botão **Teclas** troca cada tecla do jogo — vale para o Nintendo DS, a Sala online, a aba **Meus jogos** **e todos os jogos do acervo** que rodam no modo do site (Arcade, Mega Drive, Super Nintendo, Atari 2600/5200/7800, TurboGrafx-16, WonderSwan e Lynx).
 - **Modo do site / Archive**: no player, o botão alterna entre **Rodar no site** (emulador na própria página, com teclas trocáveis) e **Rodar no Archive** (player original do Internet Archive). A escolha fica salva. Plataformas sem core no site (MS-DOS, ColecoVision, Odyssey², Channel F, Super Cassette Vision, Astrocade, CreatiVision, Aquarius, Mega Duck) usam o Archive automaticamente.
 - **Controle USB/Bluetooth**: funciona como teclado no DS e na Sala online (inclusive no convidado); nos jogos do acervo em modo do site, o próprio emulador usa o controle direto.
 
@@ -52,6 +54,26 @@ Observações:
 - O `jogos-data.js` tem cerca de 2 MB — dentro do limite do GitHub.
 - O acervo continua dependendo de internet: os jogos são transmitidos pelo Internet Archive.
 
+## Meus jogos (PlayStation, Nintendo 64, NES e outros)
+
+**Por que não tem um catálogo de PlayStation, Xbox e Nintendo?** Os jogos comerciais desses consoles são protegidos por direitos autorais: não é legal baixá-los nem distribuí-los, e o site não hospeda jogos. A forma legal é rodar **uma cópia que você mesmo fez** do seu jogo (do seu cartucho ou disco) ou comprar/jogar pelos serviços oficiais. Xbox (e PlayStation 2 em diante) não roda no navegador — use o console ou o serviço oficial.
+
+Como jogar o seu arquivo:
+
+1. Abra a aba **Meus jogos**.
+2. Encontre o console no cartão (ex.: **PlayStation 1**, **Nintendo 64**, **NES**).
+3. Clique em **Escolher arquivo** e selecione o arquivo do jogo no seu computador (ex.: `.nes`, `.sfc`, `.gba`, `.n64`, `.cue`/`.bin`).
+4. Espere o emulador abrir e **clique dentro da tela** para o teclado valer.
+5. Use **Teclas** para trocar as teclas e **Trocar jogo** para voltar à lista.
+
+Detalhes:
+
+- O arquivo **não é enviado nem guardado** em servidor nenhum; ele fica só na memória da aba (ao trocar de aba ou fechar a página, é preciso escolher de novo).
+- **PlayStation 1**: prefira o arquivo `.cue` quando vier junto do `.bin`. Na maioria dos jogos o emulador dispensa BIOS.
+- **Nintendo 64**: teclado/controle no menu de opções do emulador (engrenagem).
+- **Atari 2600/7800**: arquivos `.a26`/`.a78` ou `.bin`.
+- **Arcade**: use o `.zip` do jogo; `V` insere ficha e `Enter` é Start.
+
 ## Sala online
 
 1. Abra a aba **Sala online**.
@@ -72,14 +94,15 @@ Detalhes:
 - **Consoles**: setas + `Z`/`X` (e `A`/`S` para os outros botões); `Enter` costuma ser Start.
 - **MS-DOS**: mouse e teclado (clique na tela para capturar o mouse).
 - **Nintendo DS**: mouse/toque na tela de baixo; setas, `Z`/`X`, `A`/`S`, `Enter` (Start), `V` (Select).
+- **PlayStation 1 / Nintendo 64 / Game Boy / GBA / Mega Drive (Meus jogos)**: setas + `Z`/`X`, `A`/`S` (X/Y e L/R), `Enter` (Start), `V` (Select). No N64 e no PS1, ajuste o controle no menu de opções do emulador.
 
 ### Trocar as teclas (qualquer jogo)
 
-1. Abra o jogo: na aba **Acervo**, clique no jogo; ou, na aba **Nintendo DS**, escolha o seu arquivo.
-2. Se o jogo estiver rodando no Archive, clique em **Rodar no site** no topo do player — o **Teclas** só aparece no modo do site.
+1. Abra o jogo: na aba **Acervo**, clique no jogo; na aba **Nintendo DS** ou **Meus jogos**, escolha o seu arquivo.
+2. Se o jogo do acervo estiver rodando no Archive, clique em **Rodar no site** no topo do player — o **Teclas** só aparece no modo do site.
 3. Clique em **Teclas**.
 4. Em cada ação (Cima, Baixo, A, B, Start...), clique em **Mudar** e pressione a tecla nova. `Esc` cancela.
-5. As teclas ficam salvas neste navegador e valem para todos os jogos do acervo em modo do site; **Restaurar padrão** volta ao original.
+5. As teclas ficam salvas neste navegador e valem para todos os jogos do acervo em modo do site, para o DS e para **Meus jogos**; **Restaurar padrão** volta ao original.
 6. Depois de trocar, clique na tela do jogo uma vez para o teclado valer. `Esc` (com o jogo em foco) fecha o player.
 
 Padrão: setas para direcional, `Z` (A), `X` (B), `A` (X), `S` (Y), `Q`/`E` (L/R), `Enter` (Start, que no Arcade é o **Start**) e `V` (Select, que no Arcade insere a **ficha**).
@@ -109,6 +132,6 @@ Abrir Fliperama.cmd # atalho do Windows para abrir o site
 
 ## Aviso legal
 
-Este projeto **não hospeda nem distribui jogos** — o repositório não contém ROMs, BIOS nem qualquer arquivo de jogo. O acervo apenas incorpora o player público do Internet Archive, ou, no modo do site, baixa o arquivo direto do Internet Archive pelo proxy oficial deles (`cors.archive.org`) e emula na própria página. As abas **Nintendo DS** e **Sala online** executam somente arquivos fornecidos pelo próprio usuário, localmente no navegador — nada é enviado ou armazenado em servidor. Não inclua arquivos de jogos (ROMs) neste repositório.
+Este projeto **não hospeda nem distribui jogos** — o repositório não contém ROMs, BIOS nem qualquer arquivo de jogo. O acervo apenas incorpora o player público do Internet Archive, ou, no modo do site, baixa o arquivo direto do Internet Archive pelo proxy oficial deles (`cors.archive.org`) e emula na própria página. As abas **Nintendo DS**, **Meus jogos** e **Sala online** executam somente arquivos fornecidos pelo próprio usuário, localmente no navegador — nada é enviado ou armazenado em servidor. Os catálogos comerciais de PlayStation, Xbox e Nintendo não são incluídos justamente por direitos autorais. Não inclua arquivos de jogos (ROMs) neste repositório.
 
 O código está disponível para uso pessoal; não há licença definida. Se quiser abrir o projeto, adicione uma licença (por exemplo, MIT).
