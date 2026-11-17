@@ -478,6 +478,31 @@
     background: #101019;
   }
 
+  .thumb-free {
+    position: absolute;
+    inset: 0;
+    display: grid;
+    place-items: center;
+    font-family: var(--font-pixel);
+    font-size: 22px;
+    letter-spacing: 3px;
+    color: rgba(255, 255, 255, 0.92);
+    text-shadow: 0 2px 12px rgba(0, 0, 0, 0.55);
+    background:
+      radial-gradient(circle at 28% 22%, rgba(255, 255, 255, 0.22), transparent 45%),
+      linear-gradient(145deg, var(--pc), #05050b 82%);
+  }
+
+  .badge-free {
+    top: auto;
+    bottom: 8px;
+    left: auto;
+    right: 8px;
+    color: #63e6be;
+    border-color: rgba(99, 230, 190, 0.5);
+    background: rgba(5, 5, 12, 0.86);
+  }
+
   .card:hover .thumb img { transform: scale(1.05); }
 
   .badge {
@@ -1141,6 +1166,7 @@
       <div id="platAll" class="plat-all" hidden></div>
       <p class="plat-note">
         <span>
+          <b>Jogos grátis:</b> homebrew com licença aberta (MIT) roda direto no site — use o filtro <b>Grátis</b>.
           <b>PlayStation, Xbox e Nintendo</b>: os jogos comerciais são protegidos por direitos autorais e não podem
           entrar no site. Para rodar <b>os seus próprios arquivos</b> (PS1, Nintendo 64, NES, SNES, Game Boy, GBA…), use
           a aba <b>Meus jogos</b>.
@@ -1418,6 +1444,7 @@
 </div>
 
 <script src="jogos-data.js"></script>
+<script src="livres-data.js"></script>
 <script>
 (function () {
   'use strict';
@@ -1447,8 +1474,44 @@
     astrocade: '#da77f2',
     creativision: '#8ce99a',
     aquarius: '#91a7ff',
-    megaduck: '#ffc078'
+    megaduck: '#ffc078',
+    nes: '#ff6b6b'
   };
+
+  /* ---------- jogos grátis e homebrew (licença livre) ---------- */
+
+  var FREE = {};
+  var FREE_COUNT = 0;
+
+  (function mergeLivres() {
+    var L = window.LIVRES;
+    if (!L || !L.jogos || !L.jogos.length) return;
+
+    var index = {};
+    var i;
+    for (i = 0; i < PLAT.length; i++) index[PLAT[i].id] = i;
+
+    (L.plataformas || []).forEach(function (p) {
+      if (index[p.id] !== undefined) return;
+      index[p.id] = PLAT.length;
+      PLAT.push({ id: p.id, nome: p.nome, n: 0 });
+    });
+
+    var extra = [];
+    L.jogos.forEach(function (g) {
+      var pi = index[g.plataforma];
+      if (pi === undefined || !g.url || !g.core) return;
+      var id = 'free:' + g.id;
+      FREE[id] = g;
+      PLAT[pi].n += 1;
+      CAT.total += 1;
+      extra.push([id, g.titulo, g.ano || 0, pi]);
+    });
+
+    if (!extra.length) return;
+    FREE_COUNT = extra.length;
+    GAMES = extra.concat(GAMES);
+  })();
 
   var el = {
     q: document.getElementById('q'),
@@ -1561,6 +1624,11 @@
     allChip.classList.add('active');
     el.chips.appendChild(allChip);
 
+    if (FREE_COUNT) {
+      quickIds.free = true;
+      el.chips.appendChild(chip('Grátis', FREE_COUNT, 'free', '#63e6be'));
+    }
+
     ['genesis', 'msdos', 'arcade', 'atari2600', 'snes'].forEach(function (id) {
       var p = PLAT.find(function (x) { return x.id === id; });
       if (!p || quickIds[p.id]) return;
@@ -1571,7 +1639,7 @@
 
   var PLAT_BRANDS = [
     ['Fliperama e computador', ['arcade', 'msdos']],
-    ['Nintendo', ['snes']],
+    ['Nintendo', ['snes', 'nes']],
     ['Sega', ['genesis']],
     ['Atari', ['atari2600', 'atari5200', 'atari7800', 'lynx']],
     ['NEC', ['tg16']],
@@ -1667,7 +1735,9 @@
     for (var i = 0; i < GAMES.length; i++) {
       var g = GAMES[i];
       if (state.favOnly && !favs.has(g[0])) continue;
-      if (state.platform !== 'all' && state.platform !== PLAT[g[3]].id) continue;
+      if (state.platform === 'free') {
+        if (!FREE[g[0]]) continue;
+      } else if (state.platform !== 'all' && state.platform !== PLAT[g[3]].id) continue;
       if (q && keyOf(i).indexOf(q) === -1) continue;
       list.push(g);
     }
@@ -1687,9 +1757,11 @@
     el.resultCount.innerHTML = '<b>' + fmt(list.length) + '</b> ' + (list.length === 1 ? 'jogo' : 'jogos');
     el.toolbarHint.textContent = state.favOnly
       ? 'Mostrando seus favoritos'
-      : state.platform === 'all'
-        ? 'Clique em um jogo para abrir o player'
-        : 'Plataforma: ' + PLAT.find(function (p) { return p.id === state.platform; }).nome;
+      : state.platform === 'free'
+        ? 'Homebrew grátis, com licença aberta, baixado do site dos autores'
+        : state.platform === 'all'
+          ? 'Clique em um jogo para abrir o player'
+          : 'Plataforma: ' + PLAT.find(function (p) { return p.id === state.platform; }).nome;
     appendChunk();
   }
 
@@ -1714,9 +1786,10 @@
   function makeCard(g) {
     var id = g[0], title = g[1], year = g[2], p = PLAT[g[3]];
     var color = PLAT_COLOR[p.id] || '#00e5ff';
+    var free = FREE[id];
 
     var card = document.createElement('article');
-    card.className = 'card';
+    card.className = 'card' + (free ? ' card-free' : '');
     card.dataset.id = id;
     card.style.setProperty('--pc', color);
 
@@ -1728,18 +1801,25 @@
     var thumb = document.createElement('div');
     thumb.className = 'thumb';
 
-    var ph = document.createElement('span');
-    ph.className = 'thumb-ph';
-    ph.textContent = initials(title);
-    thumb.appendChild(ph);
+    if (free) {
+      var art = document.createElement('span');
+      art.className = 'thumb-free';
+      art.textContent = initials(title);
+      thumb.appendChild(art);
+    } else {
+      var ph = document.createElement('span');
+      ph.className = 'thumb-ph';
+      ph.textContent = initials(title);
+      thumb.appendChild(ph);
 
-    var img = new Image();
-    img.loading = 'lazy';
-    img.decoding = 'async';
-    img.alt = '';
-    img.src = 'https://archive.org/services/img/' + encodeURIComponent(id);
-    img.addEventListener('error', function () { img.remove(); });
-    thumb.appendChild(img);
+      var img = new Image();
+      img.loading = 'lazy';
+      img.decoding = 'async';
+      img.alt = '';
+      img.src = 'https://archive.org/services/img/' + encodeURIComponent(id);
+      img.addEventListener('error', function () { img.remove(); });
+      thumb.appendChild(img);
+    }
 
     var badge = document.createElement('span');
     badge.className = 'badge';
@@ -1748,6 +1828,13 @@
     badge.style.borderColor = color + '66';
     badge.style.background = 'rgba(5,5,12,0.82)';
     thumb.appendChild(badge);
+
+    if (free) {
+      var freeBadge = document.createElement('span');
+      freeBadge.className = 'badge badge-free';
+      freeBadge.textContent = 'Grátis · ' + free.licenca;
+      thumb.appendChild(freeBadge);
+    }
 
     var body = document.createElement('div');
     body.className = 'card-body';
@@ -1770,6 +1857,17 @@
     var pl = document.createElement('span');
     pl.textContent = p.nome;
     meta.appendChild(pl);
+
+    if (free) {
+      var fdot = document.createElement('span');
+      fdot.className = 'dot';
+      fdot.textContent = '•';
+      meta.appendChild(fdot);
+      var fl = document.createElement('span');
+      fl.textContent = 'Grátis';
+      fl.style.color = '#63e6be';
+      meta.appendChild(fl);
+    }
 
     body.appendChild(h);
     body.appendChild(meta);
@@ -1844,7 +1942,8 @@
 
   function playerMetaText(g) {
     var p = PLAT[g[3]];
-    return (g[2] ? g[2] + ' · ' : '') + p.nome;
+    var free = FREE[g[0]];
+    return (g[2] ? g[2] + ' · ' : '') + p.nome + (free ? ' · Grátis (' + free.licenca + ')' : '');
   }
 
   function syncPlayerFav() {
@@ -1888,8 +1987,16 @@
     current = g;
     el.playerTitle.textContent = g[1];
     el.playerMeta.textContent = playerMetaText(g);
-    el.playerLink.href = 'https://archive.org/details/' + encodeURIComponent(g[0]);
-    el.playerLink.title = 'Abrir ' + g[1] + ' no Internet Archive';
+    var free = FREE[g[0]];
+    if (free) {
+      el.playerLink.href = free.fonte;
+      el.playerLink.title = 'Licença ' + free.licenca + ' e fonte de ' + g[1];
+      el.playerLink.querySelector('span').textContent = 'Licença e fonte';
+    } else {
+      el.playerLink.href = 'https://archive.org/details/' + encodeURIComponent(g[0]);
+      el.playerLink.title = 'Abrir ' + g[1] + ' no Internet Archive';
+      el.playerLink.querySelector('span').textContent = 'Abrir no Archive.org';
+    }
     el.player.hidden = false;
     document.body.style.overflow = 'hidden';
     syncPlayerFav();
@@ -1898,18 +2005,25 @@
   }
 
   function showGame(g) {
-    var cfg = siteCfg(g);
-    var site = !!cfg && enginePref() !== 'archive';
+    var free = FREE[g[0]];
+    var cfg = free ? { core: free.core } : siteCfg(g);
+    var site = free ? true : (!!cfg && enginePref() !== 'archive');
     siteActive = site;
     el.playerKeys.hidden = !site;
-    el.playerMode.hidden = !cfg;
+    el.playerMode.hidden = !cfg || !!free;
     el.playerMode.textContent = site ? 'Rodar no Archive' : 'Rodar no site';
     el.playerError.hidden = true;
     el.frameLoading.classList.remove('done');
     el.frameLoadingText.textContent = 'Carregando o jogo…';
     el.frame.onload = null;
 
-    if (site) {
+    if (free) {
+      el.playerTip.innerHTML = 'Jogo grátis e legal (licença <b>' + free.licenca + '</b>), por ' + free.autor + '. ' +
+        'Arquivo baixado do repositório oficial. Troque as teclas em <b>Teclas</b>. <kbd>Esc</kbd> fecha o jogo.';
+      el.frame.src = 'siteplayer.html?src=' + encodeURIComponent(free.url) +
+        '&core=' + encodeURIComponent(free.core) +
+        '&name=' + encodeURIComponent(g[1]);
+    } else if (site) {
       el.playerTip.innerHTML = 'Troque as teclas no botão <b>Teclas</b> — vale para todos os jogos do site. ' +
         '<kbd>Esc</kbd> fecha o jogo. O controle USB/Bluetooth funciona direto no emulador ' +
         '(menu de opções → Configurações do Controle).';

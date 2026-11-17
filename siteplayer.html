@@ -27,6 +27,21 @@
   var core = params.get('core') || '';
   var gameName = params.get('name') || 'Jogo';
   var biosUrl = params.get('bios') || '';
+  var directUrl = params.get('src') || '';
+
+  /* Jogos grátis/homebrew: só baixamos do site oficial do autor, nunca de um espelho nosso. */
+  var DIRECT_HOSTS = ['raw.githubusercontent.com', 'cdn.jsdelivr.net', 'github.io'];
+
+  function directOk(u) {
+    try {
+      var x = new URL(u);
+      if (x.protocol !== 'https:') return false;
+      if (DIRECT_HOSTS.indexOf(x.hostname) >= 0) return true;
+      return /\.github\.io$/.test(x.hostname) || /\.githubusercontent\.com$/.test(x.hostname);
+    } catch (e) {
+      return false;
+    }
+  }
 
   function post(msg) {
     try { parent.postMessage(msg, '*'); } catch (e) {}
@@ -182,40 +197,48 @@
       if (!err) return;
       told = true;
       obs.disconnect();
-      fail('O emulador não conseguiu abrir este arquivo. Tente de novo ou use “Rodar no Archive”.');
+      fail(directUrl
+        ? 'O emulador não conseguiu abrir este arquivo grátis. Tente de novo mais tarde.'
+        : 'O emulador não conseguiu abrir este arquivo. Tente de novo ou use “Rodar no Archive”.');
     });
     obs.observe(document.body, { childList: true, subtree: true, attributes: true, attributeFilter: ['class'] });
     setTimeout(function () { obs.disconnect(); }, 180000);
   }
 
   function boot(meta) {
-    var ext = '';
-    var files = [];
-    if (meta) {
-      ext = (meta.metadata && meta.metadata.emulator_ext) || '';
-      files = (meta.files || []).map(function (f) { return f && f.name; }).filter(Boolean);
-    }
-
-    var file = '';
-    if (ext) {
-      var want = gameId + '.' + ext;
-      if (files.indexOf(want) >= 0) {
-        file = want;
-      } else {
-        var cand = files.filter(function (n) {
-          return n.toLowerCase().slice(-(ext.length + 1)) === '.' + ext.toLowerCase();
-        }).sort(function (a, b) { return a.length - b.length; });
-        file = cand[0] || want;
-      }
+    var url;
+    var direct = !!directUrl;
+    if (direct) {
+      url = directUrl;
+      post({ type: 'flp-status', text: 'Baixando o jogo grátis do site do autor…' });
     } else {
-      var zip = gameId + '.zip';
-      file = files.indexOf(zip) >= 0 ? zip : (files.length === 1 ? files[0] : zip);
+      var ext = '';
+      var files = [];
+      if (meta) {
+        ext = (meta.metadata && meta.metadata.emulator_ext) || '';
+        files = (meta.files || []).map(function (f) { return f && f.name; }).filter(Boolean);
+      }
+
+      var file = '';
+      if (ext) {
+        var want = gameId + '.' + ext;
+        if (files.indexOf(want) >= 0) {
+          file = want;
+        } else {
+          var cand = files.filter(function (n) {
+            return n.toLowerCase().slice(-(ext.length + 1)) === '.' + ext.toLowerCase();
+          }).sort(function (a, b) { return a.length - b.length; });
+          file = cand[0] || want;
+        }
+      } else {
+        var zip = gameId + '.zip';
+        file = files.indexOf(zip) >= 0 ? zip : (files.length === 1 ? files[0] : zip);
+      }
+
+      url = 'https://cors.archive.org/cors/' + encodeURIComponent(gameId) + '/' +
+        file.split('/').map(function (p) { return encodeURIComponent(p); }).join('/');
+      post({ type: 'flp-status', text: 'Baixando o jogo do Archive.org…' });
     }
-
-    var url = 'https://cors.archive.org/cors/' + encodeURIComponent(gameId) + '/' +
-      file.split('/').map(function (p) { return encodeURIComponent(p); }).join('/');
-
-    post({ type: 'flp-status', text: 'Baixando o jogo do Archive.org…' });
 
     window.EJS_player = '#game';
     window.EJS_core = core;
@@ -239,7 +262,23 @@
     document.body.appendChild(script);
   }
 
-  if (!gameId || !core) {
+  var CORES = {
+    nes: 1, snes: 1, gb: 1, gba: 1, n64: 1, nds: 1,
+    segaMD: 1, segaMS: 1, segaGG: 1,
+    atari2600: 1, atari7800: 1, pce: 1, ws: 1, ngp: 1, vb: 1, lynx: 1,
+    arcade: 1, psx: 1
+  };
+
+  if (!CORES[core]) {
+    fail('Console não reconhecido. Feche o player e abra o jogo de novo.');
+  } else if (directUrl) {
+    if (!directOk(directUrl)) {
+      fail('O endereço deste jogo grátis não é permitido.');
+    } else {
+      post({ type: 'flp-status', text: 'Preparando o jogo grátis…' });
+      boot(null);
+    }
+  } else if (!gameId) {
     fail('Faltou informação do jogo. Feche o player e abra o jogo de novo.');
   } else {
     post({ type: 'flp-status', text: 'Preparando o jogo…' });
