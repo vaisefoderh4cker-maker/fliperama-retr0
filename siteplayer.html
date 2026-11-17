@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Fliperama Retrô — jogo</title>
+<style>
+  html, body { margin: 0; height: 100%; background: #000; overflow: hidden; }
+  #game { width: 100%; height: 100%; }
+</style>
+</head>
+<body>
+<div id="game"></div>
+<script>
+(function () {
+  'use strict';
+
+  /* Mesmas teclas da página principal (EmulatorJS usa exatamente estas por padrão). */
+  var VIRTUAL = {
+    up: 'ArrowUp', down: 'ArrowDown', left: 'ArrowLeft', right: 'ArrowRight',
+    a: 'z', b: 'x', x: 'a', y: 's', l: 'q', r: 'e', start: 'Enter', select: 'v'
+  };
+  var STORE = 'fliperama-retro:teclas';
+
+  var params = new URLSearchParams(location.search);
+  var gameId = params.get('id') || '';
+  var core = params.get('core') || '';
+  var gameName = params.get('name') || 'Jogo';
+  var biosUrl = params.get('bios') || '';
+
+  function post(msg) {
+    try { parent.postMessage(msg, '*'); } catch (e) {}
+  }
+
+  function fail(text) {
+    post({ type: 'flp-error', text: text });
+  }
+
+  /* ---------- teclas trocáveis ---------- */
+
+  function norm(k) {
+    return typeof k === 'string' && k.length === 1 ? k.toLowerCase() : String(k || '');
+  }
+
+  function loadBindings() {
+    var b = {};
+    var k;
+    for (k in VIRTUAL) b[k] = VIRTUAL[k];
+    try {
+      var saved = JSON.parse(localStorage.getItem(STORE) || 'null');
+      if (saved && typeof saved === 'object') {
+        for (k in saved) {
+          if (VIRTUAL.hasOwnProperty(k) && typeof saved[k] === 'string' && saved[k]) b[k] = saved[k];
+        }
+      }
+    } catch (e) {}
+    return b;
+  }
+
+  var bindings = loadBindings();
+  var byKey = {};
+  var virtByKey = {};
+
+  function rebuild() {
+    byKey = {};
+    virtByKey = {};
+    for (var id in VIRTUAL) {
+      virtByKey[norm(VIRTUAL[id])] = id;
+      byKey[norm(bindings[id] || VIRTUAL[id])] = id;
+    }
+  }
+  rebuild();
+
+  function keyMoved(id) {
+    return norm(bindings[id]) !== norm(VIRTUAL[id]);
+  }
+
+  var CODES = {
+    ArrowUp: 38, ArrowDown: 40, ArrowLeft: 37, ArrowRight: 39, Enter: 13
+  };
+  var CODE_NAMES = {
+    ArrowUp: 'ArrowUp', ArrowDown: 'ArrowDown', ArrowLeft: 'ArrowLeft', ArrowRight: 'ArrowRight', Enter: 'Enter'
+  };
+
+  function keyCode(k) {
+    return k.length === 1 ? k.toUpperCase().charCodeAt(0) : (CODES[k] || 0);
+  }
+
+  function codeName(k) {
+    if (k.length === 1) {
+      if (/[a-z]/i.test(k)) return 'Key' + k.toUpperCase();
+      if (/[0-9]/.test(k)) return 'Digit' + k;
+      return '';
+    }
+    return CODE_NAMES[k] || k;
+  }
+
+  function canvas() {
+    return document.querySelector('#game canvas') || document.querySelector('canvas') || document.body;
+  }
+
+  function fire(key, down) {
+    var target = canvas();
+    var ev = new KeyboardEvent(down ? 'keydown' : 'keyup', {
+      key: key,
+      code: codeName(key),
+      bubbles: true,
+      cancelable: true
+    });
+    ev.__flpVirtual = true;
+    try {
+      Object.defineProperty(ev, 'keyCode', { get: function () { return keyCode(key); } });
+      Object.defineProperty(ev, 'which', { get: function () { return keyCode(key); } });
+    } catch (e) {}
+    try { target.dispatchEvent(ev); } catch (e) {}
+  }
+
+  /* Menus próprios do emulador (configurações de controle etc.) recebem as teclas direto. */
+  function ejsUiOpen() {
+    var t = document.activeElement;
+    if (t && /^(INPUT|SELECT|TEXTAREA)$/.test(t.tagName)) return true;
+    var settings = document.querySelector('.ejs_settings_parent');
+    if (settings && settings.style.display !== 'none') return true;
+    var pops = document.querySelectorAll('.ejs_popup_container');
+    for (var i = 0; i < pops.length; i++) {
+      if (pops[i].offsetParent !== null) return true;
+    }
+    return false;
+  }
+
+  function onKey(e) {
+    if (e.__flpVirtual) return;
+
+    if (e.key === 'Escape') {
+      if (ejsUiOpen() || document.fullscreenElement) return;
+      e.preventDefault();
+      e.stopPropagation();
+      post({ type: 'flp-esc' });
+      return;
+    }
+
+    if (ejsUiOpen()) return;
+
+    var n = norm(e.key);
+    var action = byKey[n];
+    if (action) {
+      e.preventDefault();
+      e.stopPropagation();
+      if (e.stopImmediatePropagation) e.stopImmediatePropagation();
+      fire(VIRTUAL[action], e.type === 'keydown');
+      return;
+    }
+    var moved = virtByKey[n];
+    if (moved && keyMoved(moved)) {
+      e.preventDefault();
+      e.stopPropagation();
+      if (e.stopImmediatePropagation) e.stopImmediatePropagation();
+    }
+  }
+
+  window.addEventListener('keydown', onKey, true);
+  window.addEventListener('keyup', onKey, true);
+
+  window.addEventListener('storage', function (e) {
+    if (e.key === STORE || e.key === null) {
+      bindings = loadBindings();
+      rebuild();
+    }
+  });
+  window.addEventListener('focus', function () {
+    bindings = loadBindings();
+    rebuild();
+  });
+
+  /* ---------- carregar o jogo direto do Internet Archive ---------- */
+
+  function watchEjsError() {
+    var told = false;
+    var obs = new MutationObserver(function () {
+      if (told) return;
+      var err = document.querySelector('.ejs_error_text');
+      if (!err) return;
+      told = true;
+      obs.disconnect();
+      fail('O emulador não conseguiu abrir este arquivo. Tente de novo ou use “Rodar no Archive”.');
+    });
+    obs.observe(document.body, { childList: true, subtree: true, attributes: true, attributeFilter: ['class'] });
+    setTimeout(function () { obs.disconnect(); }, 180000);
+  }
+
+  function boot(meta) {
+    var ext = '';
+    var files = [];
+    if (meta) {
+      ext = (meta.metadata && meta.metadata.emulator_ext) || '';
+      files = (meta.files || []).map(function (f) { return f && f.name; }).filter(Boolean);
+    }
+
+    var file = '';
+    if (ext) {
+      var want = gameId + '.' + ext;
+      if (files.indexOf(want) >= 0) {
+        file = want;
+      } else {
+        var cand = files.filter(function (n) {
+          return n.toLowerCase().slice(-(ext.length + 1)) === '.' + ext.toLowerCase();
+        }).sort(function (a, b) { return a.length - b.length; });
+        file = cand[0] || want;
+      }
+    } else {
+      var zip = gameId + '.zip';
+      file = files.indexOf(zip) >= 0 ? zip : (files.length === 1 ? files[0] : zip);
+    }
+
+    var url = 'https://cors.archive.org/cors/' + encodeURIComponent(gameId) + '/' +
+      file.split('/').map(function (p) { return encodeURIComponent(p); }).join('/');
+
+    post({ type: 'flp-status', text: 'Baixando o jogo do Archive.org…' });
+
+    window.EJS_player = '#game';
+    window.EJS_core = core;
+    window.EJS_gameUrl = url;
+    window.EJS_gameName = gameName;
+    window.EJS_pathtodata = 'https://cdn.emulatorjs.org/stable/data/';
+    window.EJS_startOnLoaded = true;
+    window.EJS_language = 'pt-BR';
+    if (biosUrl) window.EJS_biosUrl = biosUrl;
+    window.EJS_onGameStart = function () {
+      post({ type: 'flp-started' });
+    };
+
+    watchEjsError();
+
+    var script = document.createElement('script');
+    script.src = 'https://cdn.emulatorjs.org/stable/data/loader.js';
+    script.onerror = function () {
+      fail('Não consegui carregar o emulador. Confira a internet e tente de novo.');
+    };
+    document.body.appendChild(script);
+  }
+
+  if (!gameId || !core) {
+    fail('Faltou informação do jogo. Feche o player e abra o jogo de novo.');
+  } else {
+    post({ type: 'flp-status', text: 'Preparando o jogo…' });
+    fetch('https://archive.org/metadata/' + encodeURIComponent(gameId), { credentials: 'omit' })
+      .then(function (r) {
+        if (!r.ok) throw new Error('metadata');
+        return r.json();
+      })
+      .then(boot)
+      .catch(function () { boot(null); });
+  }
+})();
+</script>
+</body>
+</html>

@@ -634,6 +634,26 @@
 
   .frame-loading.done { opacity: 0; }
 
+  .frame-error {
+    position: absolute;
+    inset: 0;
+    z-index: 3;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    padding: 24px;
+    text-align: center;
+    color: var(--muted);
+    font-size: 13.5px;
+    background: radial-gradient(600px 300px at 50% 40%, #12121f, #050509);
+  }
+
+  .frame-error[hidden] { display: none; }
+
+  .frame-error strong { color: var(--text); font-size: 15px; }
+
   .spinner {
     width: 34px;
     height: 34px;
@@ -879,6 +899,7 @@
   .ctl-pad.on { color: var(--accent); }
   .ctl-check { display: flex; align-items: flex-start; gap: 8px; color: var(--muted); font-size: 12.5px; line-height: 1.45; cursor: pointer; }
   .ctl-check input { margin-top: 2px; accent-color: var(--accent); }
+  .ctl-check[hidden] { display: none; }
 
   @media (max-width: 720px) {
     .ctl-rows { grid-template-columns: 1fr; }
@@ -1129,8 +1150,8 @@
       <div>
         <h2 id="ctlTitle">Teclas do jogo</h2>
         <p>
-          Vale para o Nintendo DS e para a Sala online. Clique em <b>Mudar</b> e pressione a tecla nova. Os jogos do
-          acervo abrem no Internet Archive e têm as teclas próprias deles.
+          Vale para o Nintendo DS, a Sala online e todos os jogos do acervo que rodam no site. Clique em
+          <b>Mudar</b> e pressione a tecla nova. Jogos abertos no player do Archive (sem o modo do site) têm teclas fixas.
         </p>
       </div>
       <button id="ctlCloseBtn" class="close-btn" type="button" aria-label="Fechar">✕</button>
@@ -1138,7 +1159,7 @@
     <div id="ctlRows" class="ctl-rows"></div>
     <footer class="ctl-foot">
       <div style="flex:1 1 100%">
-        <label class="ctl-check">
+        <label id="ctlPadRow" class="ctl-check">
           <input id="ctlPadUse" type="checkbox" checked>
           Usar controle USB/Bluetooth como teclas (desligue se o controle já responder sozinho dentro do emulador).
         </label>
@@ -1154,7 +1175,8 @@
 <footer>
   <div class="wrap">
     <b>Fliperama Retrô</b> é um catálogo local e não hospeda nenhum jogo.<br>
-    Todos os jogos são hospedados, emulados e transmitidos pelo <b>Internet Archive</b> — é preciso estar conectado à internet.<br>
+    Todos os jogos continuam hospedados no <b>Internet Archive</b> e são enviados de lá direto para o seu navegador — é preciso estar conectado à internet.<br>
+    No <b>modo do site</b>, o emulador roda na própria página para você poder trocar as teclas; nenhum jogo é guardado aqui.<br>
     Para abrir o jogo em outra aba ou ver detalhes, use “Abrir no Archive.org” dentro do player.<br>
     Na aba <b>Nintendo DS</b>, o arquivo escolhido por você roda localmente no navegador e não é enviado a lugar nenhum.<br>
     Na aba <b>Sala online</b>, a imagem vai direto do PC do anfitrião para os amigos (conexão ponto a ponto); nada é gravado nem hospedado.
@@ -1169,6 +1191,8 @@
         <p class="meta" id="playerMeta"></p>
       </div>
       <div class="player-actions">
+        <button id="playerKeys" class="ext-link" type="button" hidden>Teclas</button>
+        <button id="playerMode" class="ext-link" type="button" hidden>Rodar no Archive</button>
         <button id="playerFav" class="fav-toggle" type="button" aria-pressed="false">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" aria-hidden="true">
             <path d="M12 3.4 14.7 9l6.1.9-4.4 4.3 1 6.1-5.4-2.9-5.4 2.9 1-6.1L3.2 9.9 9.3 9z"></path>
@@ -1185,12 +1209,16 @@
     <div class="player-frame">
       <div id="frameLoading" class="frame-loading">
         <span class="spinner" aria-hidden="true"></span>
-        Carregando o jogo…
+        <span id="frameLoadingText">Carregando o jogo…</span>
+      </div>
+      <div id="playerError" class="frame-error" hidden>
+        <strong>Não deu para abrir este jogo no player do site.</strong>
+        <span id="playerErrorText">Tente de novo ou use “Rodar no Archive”.</span>
       </div>
       <iframe id="gameFrame" title="Player do jogo" allow="autoplay; fullscreen; gamepad" allowfullscreen referrerpolicy="no-referrer"></iframe>
     </div>
 
-    <p class="player-tip">Clique dentro da tela para usar o teclado. <kbd>Esc</kbd> fecha o jogo. Controles e tela cheia ficam no menu do player.</p>
+    <p id="playerTip" class="player-tip">Clique dentro da tela para usar o teclado. <kbd>Esc</kbd> fecha o jogo. Controles e tela cheia ficam no menu do player.</p>
   </div>
 </div>
 
@@ -1250,6 +1278,12 @@
     playerLink: document.getElementById('playerLink'),
     playerFav: document.getElementById('playerFav'),
     playerFavLabel: document.getElementById('playerFavLabel'),
+    playerKeys: document.getElementById('playerKeys'),
+    playerMode: document.getElementById('playerMode'),
+    playerTip: document.getElementById('playerTip'),
+    playerError: document.getElementById('playerError'),
+    playerErrorText: document.getElementById('playerErrorText'),
+    frameLoadingText: document.getElementById('frameLoadingText'),
     closePlayer: document.getElementById('closePlayer')
   };
 
@@ -1541,32 +1575,120 @@
     el.playerFav.querySelector('svg').setAttribute('fill', on ? 'currentColor' : 'none');
   }
 
+  var ENGINE_KEY = 'fliperama-retro:emulador';
+
+  var SITE_PLAT = {
+    0: { core: 'fbneo' },
+    2: { core: 'genesis_plus_gx' },
+    3: { core: 'snes9x' },
+    4: { core: 'stella2014' },
+    5: { core: 'prosystem' },
+    6: { core: 'mednafen_pce' },
+    7: { core: 'mednafen_wswan' },
+    9: { core: 'a5200', bios: 'https://emularity-bios.ux-b.archive.org/a5200.zip' },
+    11: { core: 'handy' }
+  };
+
+  var siteActive = false;
+
+  function siteCfg(g) {
+    return SITE_PLAT[g[3]] || null;
+  }
+
+  function enginePref() {
+    try { return localStorage.getItem(ENGINE_KEY) === 'archive' ? 'archive' : 'site'; } catch (e) { return 'site'; }
+  }
+
+  function engineSave(v) {
+    try { localStorage.setItem(ENGINE_KEY, v); } catch (e) {}
+  }
+
   function openPlayer(g) {
     current = g;
     el.playerTitle.textContent = g[1];
     el.playerMeta.textContent = playerMetaText(g);
     el.playerLink.href = 'https://archive.org/details/' + encodeURIComponent(g[0]);
     el.playerLink.title = 'Abrir ' + g[1] + ' no Internet Archive';
-    el.frameLoading.classList.remove('done');
     el.player.hidden = false;
     document.body.style.overflow = 'hidden';
     syncPlayerFav();
-
-    el.frame.onload = function () {
-      el.frameLoading.classList.add('done');
-    };
-    el.frame.src = 'https://archive.org/embed/' + encodeURIComponent(g[0]);
+    showGame(g);
     el.closePlayer.focus();
+  }
+
+  function showGame(g) {
+    var cfg = siteCfg(g);
+    var site = !!cfg && enginePref() !== 'archive';
+    siteActive = site;
+    el.playerKeys.hidden = !site;
+    el.playerMode.hidden = !cfg;
+    el.playerMode.textContent = site ? 'Rodar no Archive' : 'Rodar no site';
+    el.playerError.hidden = true;
+    el.frameLoading.classList.remove('done');
+    el.frameLoadingText.textContent = 'Carregando o jogo…';
+    el.frame.onload = null;
+
+    if (site) {
+      el.playerTip.innerHTML = 'Troque as teclas no botão <b>Teclas</b> — vale para todos os jogos do site. ' +
+        '<kbd>Esc</kbd> fecha o jogo. O controle USB/Bluetooth funciona direto no emulador ' +
+        '(menu de opções → Configurações do Controle).';
+      el.frame.src = 'siteplayer.html?id=' + encodeURIComponent(g[0]) +
+        '&core=' + encodeURIComponent(cfg.core) +
+        '&name=' + encodeURIComponent(g[1]) +
+        (cfg.bios ? '&bios=' + encodeURIComponent(cfg.bios) : '');
+    } else {
+      el.playerTip.innerHTML = cfg
+        ? 'Rodando no player do Archive: aqui as teclas são fixas. Use “Rodar no site” para poder trocar as teclas. ' +
+          '<kbd>Esc</kbd> fecha o jogo.'
+        : 'Neste console o jogo roda no player do Archive e as teclas não podem ser trocadas. ' +
+          'Clique dentro da tela para usar o teclado. <kbd>Esc</kbd> fecha o jogo.';
+      el.frame.onload = function () {
+        el.frameLoading.classList.add('done');
+      };
+      el.frame.src = 'https://archive.org/embed/' + encodeURIComponent(g[0]);
+    }
   }
 
   function closePlayer() {
     el.player.hidden = true;
     el.frame.onload = null;
-    el.frame.src = '';
+    el.frame.src = 'about:blank';
+    el.playerError.hidden = true;
+    siteActive = false;
     current = null;
     document.body.style.overflow = '';
     if (el.q) el.q.focus({ preventScroll: true });
   }
+
+  window.addEventListener('message', function (e) {
+    if (!e.source || !el.frame.contentWindow || e.source !== el.frame.contentWindow) return;
+    var d = e.data;
+    if (!d || typeof d !== 'object') return;
+    if (d.type === 'flp-status') {
+      if (typeof d.text === 'string' && d.text) el.frameLoadingText.textContent = d.text;
+      return;
+    }
+    if (d.type === 'flp-started') {
+      el.frameLoading.classList.add('done');
+      return;
+    }
+    if (d.type === 'flp-error') {
+      el.frameLoading.classList.add('done');
+      el.playerError.hidden = false;
+      el.playerErrorText.textContent = typeof d.text === 'string' && d.text
+        ? d.text
+        : 'Tente de novo ou use “Rodar no Archive”.';
+      return;
+    }
+    if (d.type === 'flp-esc' && !el.player.hidden) closePlayer();
+  });
+
+  el.playerMode.addEventListener('click', function () {
+    if (!current) return;
+    engineSave(enginePref() === 'site' ? 'archive' : 'site');
+    showGame(current);
+    el.playerMode.focus();
+  });
 
   el.closePlayer.addEventListener('click', closePlayer);
 
@@ -2185,6 +2307,7 @@
   var ctlReset = document.getElementById('ctlReset');
   var ctlPadStatus = document.getElementById('ctlPad');
   var ctlPadUse = document.getElementById('ctlPadUse');
+  var ctlPadRow = document.getElementById('ctlPadRow');
 
   var CTL_ACTIONS = [
     ['up', 'Cima'], ['down', 'Baixo'], ['left', 'Esquerda'], ['right', 'Direita'],
@@ -2286,6 +2409,7 @@
   }
 
   function ctlMode() {
+    if (siteActive) return 'site';
     if (!dsPanel.hidden && !dsPlayer.hidden && document.querySelector('#dsScreen #ejsMount canvas')) return 'ds';
     if (!netPanel.hidden && netIsHost && !netHostBox.hidden && document.querySelector('#netMount canvas')) return 'host';
     if (!netPanel.hidden && !netViewWrap.hidden && netConn && netConn.open) return 'guest';
@@ -2296,6 +2420,7 @@
     if (!action || !ctlBindings[action]) return;
     var mode = ctlMode();
     if (!mode) return;
+    if (mode === 'site') return;
     var info = ctlInfo(CTL_VIRTUAL[action] || ctlBindings[action]);
     if (mode === 'guest') {
       if (!netConn || !netConn.open) return;
@@ -2357,7 +2482,8 @@
   function ctlCloseModal() {
     ctlCapture = '';
     ctlModal.hidden = true;
-    document.body.style.overflow = '';
+    document.body.style.overflow = el.player.hidden ? '' : 'hidden';
+    if (siteActive && el.frame.contentWindow) el.frame.contentWindow.focus();
   }
 
   function ctlSetKey(action, key) {
@@ -2389,6 +2515,7 @@
         e.preventDefault();
         ctlCloseModal();
       }
+      if (e.type === 'keydown') e.stopPropagation();
       return;
     }
     var mode = ctlMode();
@@ -2423,6 +2550,15 @@
 
   function ctlUpdatePad() {
     var pads = ctlPadList();
+    var site = ctlMode() === 'site';
+    ctlPadRow.hidden = site;
+    if (site) {
+      ctlPadStatus.textContent = pads.length
+        ? 'Controle conectado: ' + (pads[0].id || 'controle') + ' — neste jogo ele funciona direto no emulador.'
+        : 'Neste jogo o controle USB/Bluetooth funciona direto no emulador (menu de opções → Configurações do Controle).';
+      ctlPadStatus.classList.toggle('on', pads.length > 0);
+      return;
+    }
     if (pads.length && ctlPadUse.checked) {
       ctlPadStatus.textContent = 'Controle conectado: ' + (pads[0].id || 'controle') + ' — botões e direcional viram as teclas acima.';
       ctlPadStatus.classList.add('on');
@@ -2455,7 +2591,7 @@
 
   function ctlPadTick() {
     var mode = ctlMode();
-    var pads = (mode && ctlModal.hidden && ctlPadUse.checked) ? ctlPadList() : [];
+    var pads = (mode && mode !== 'site' && ctlModal.hidden && ctlPadUse.checked) ? ctlPadList() : [];
     if (!pads.length) {
       for (var id in ctlPadPrev) {
         if (ctlPadPrev[id]) ctlDispatch(id, false);
@@ -2501,6 +2637,7 @@
   dsKeysPicker.addEventListener('click', ctlOpen);
   netHostKeys.addEventListener('click', ctlOpen);
   netKeys.addEventListener('click', ctlOpen);
+  el.playerKeys.addEventListener('click', ctlOpen);
   ctlCloseBtn.addEventListener('click', ctlCloseModal);
   ctlDone.addEventListener('click', ctlCloseModal);
   ctlModal.addEventListener('click', function (e) { if (e.target === ctlModal) ctlCloseModal(); });
@@ -2515,7 +2652,7 @@
   setInterval(ctlPadTick, 50);
 
   window.addEventListener('beforeunload', function () {
-    el.frame.src = '';
+    el.frame.src = 'about:blank';
   });
 })();
 </script>

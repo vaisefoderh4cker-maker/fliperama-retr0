@@ -10,7 +10,9 @@ Não é preciso instalar nada. Basta abrir no navegador (Chrome, Edge ou Firefox
 - **Super Nintendo**: 211 títulos jogáveis direto na página.
 - **Nintendo DS**: você escolhe o seu arquivo `.nds`; o jogo roda no navegador com EmulatorJS e fica guardado apenas nele (IndexedDB).
 - **Sala online**: o anfitrião abre o jogo do próprio arquivo, recebe um **código de 6 caracteres** e transmite a tela para até 3 amigos, que controlam pelo teclado (estilo "Remote Play", conexão ponto a ponto).
-- **Teclas e controle**: na aba DS e na Sala online, o botão **Teclas** permite trocar cada tecla do jogo (salvo no navegador) e controles USB/Bluetooth funcionam como teclado — inclusive no convidado da sala.
+- **Teclas em qualquer jogo**: o botão **Teclas** troca cada tecla do jogo — vale para o Nintendo DS, a Sala online **e todos os jogos do acervo** que rodam no modo do site (Arcade, Mega Drive, Super Nintendo, Atari 2600/5200/7800, TurboGrafx-16, WonderSwan e Lynx).
+- **Modo do site / Archive**: no player, o botão alterna entre **Rodar no site** (emulador na própria página, com teclas trocáveis) e **Rodar no Archive** (player original do Internet Archive). A escolha fica salva. Plataformas sem core no site (MS-DOS, ColecoVision, Odyssey², Channel F, Super Cassette Vision, Astrocade, CreatiVision, Aquarius, Mega Duck) usam o Archive automaticamente.
+- **Controle USB/Bluetooth**: funciona como teclado no DS e na Sala online (inclusive no convidado); nos jogos do acervo em modo do site, o próprio emulador usa o controle direto.
 
 ## Como abrir
 
@@ -71,30 +73,42 @@ Detalhes:
 - **MS-DOS**: mouse e teclado (clique na tela para capturar o mouse).
 - **Nintendo DS**: mouse/toque na tela de baixo; setas, `Z`/`X`, `A`/`S`, `Enter` (Start), `V` (Select).
 
-### Trocar as teclas (DS e Sala online)
+### Trocar as teclas (qualquer jogo)
 
-1. Clique em **Teclas** (na aba Nintendo DS, na sala como anfitrião ou como convidado).
-2. Em cada ação (Cima, Baixo, A, B, Start...), clique em **Mudar** e pressione a tecla nova. `Esc` cancela.
-3. As teclas ficam salvas neste navegador. **Restaurar padrão** volta tudo ao original.
+1. Abra o jogo: na aba **Acervo**, clique no jogo; ou, na aba **Nintendo DS**, escolha o seu arquivo.
+2. Se o jogo estiver rodando no Archive, clique em **Rodar no site** no topo do player — o **Teclas** só aparece no modo do site.
+3. Clique em **Teclas**.
+4. Em cada ação (Cima, Baixo, A, B, Start...), clique em **Mudar** e pressione a tecla nova. `Esc` cancela.
+5. As teclas ficam salvas neste navegador e valem para todos os jogos do acervo em modo do site; **Restaurar padrão** volta ao original.
+6. Depois de trocar, clique na tela do jogo uma vez para o teclado valer. `Esc` (com o jogo em foco) fecha o player.
 
-### Controle USB/Bluetooth
+Padrão: setas para direcional, `Z` (A), `X` (B), `A` (X), `S` (Y), `Q`/`E` (L/R), `Enter` (Start, que no Arcade é o **Start**) e `V` (Select, que no Arcade insere a **ficha**).
+
+### Modo do site e modo do Archive
+
+- **Rodar no site**: o emulador roda dentro da página (EmulatorJS) e o jogo é baixado na hora do Internet Archive pelo proxy oficial deles. É o único modo em que o **Teclas** funciona.
+- **Rodar no Archive**: abre o player público do Archive dentro do player; as teclas são as do próprio Archive, sem troca.
+- O botão alterna os modos e a escolha é lembrada no navegador. Se o jogo falhar no modo do site, o site avisa e você pode trocar para o Archive.
+- No modo do site, o controle USB/Bluetooth é usado direto pelo emulador (menu de opções → **Configurações do Controle**, dentro do jogo).
+
+### Controle USB/Bluetooth (DS e Sala online)
 
 - Conecte o controle e aperte um botão; o painel **Teclas** mostra o nome do controle detectado.
 - Direcional/analógico esquerdo, A/B/X/Y, LB/RB e Start/Select funcionam como as teclas mapeadas — no DS, no anfitrião e também no convidado (o convidado envia os comandos ao anfitrião).
 - Se o controle já responder sozinho dentro do emulador e os comandos saírem duplicados, desmarque **“Usar controle USB/Bluetooth como teclas”**.
 - Controles precisam ser reconhecidos pelo navegador: aperte um botão com a página aberta; no Windows, verifique em `joy.cpl` se o controle aparece.
-- Jogos do acervo (Internet Archive) não usam esse painel: as teclas são controladas pelo player do Archive.
 
 ## Estrutura
 
 ```
 index.html          # o site (interface, busca, abas, player e sala online)
+siteplayer.html     # página do modo do site: emulador EmulatorJS + teclas trocáveis
 jogos-data.js       # catálogo gerado a partir de metadados do Internet Archive
 Abrir Fliperama.cmd # atalho do Windows para abrir o site
 ```
 
 ## Aviso legal
 
-Este projeto **não hospeda nem distribui jogos**. O acervo apenas incorpora o player público do Internet Archive, que é quem emula e transmite os títulos. As abas **Nintendo DS** e **Sala online** executam somente arquivos fornecidos pelo próprio usuário, localmente no navegador — nada é enviado ou armazenado em servidor. Não inclua arquivos de jogos (ROMs) neste repositório.
+Este projeto **não hospeda nem distribui jogos** — o repositório não contém ROMs, BIOS nem qualquer arquivo de jogo. O acervo apenas incorpora o player público do Internet Archive, ou, no modo do site, baixa o arquivo direto do Internet Archive pelo proxy oficial deles (`cors.archive.org`) e emula na própria página. As abas **Nintendo DS** e **Sala online** executam somente arquivos fornecidos pelo próprio usuário, localmente no navegador — nada é enviado ou armazenado em servidor. Não inclua arquivos de jogos (ROMs) neste repositório.
 
 O código está disponível para uso pessoal; não há licença definida. Se quiser abrir o projeto, adicione uma licença (por exemplo, MIT).
