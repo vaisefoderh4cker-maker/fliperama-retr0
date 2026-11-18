@@ -2157,7 +2157,7 @@
     el.frameLoadingText.textContent = 'Carregando o jogo…';
     el.frame.onload = null;
 
-    var extraQ = (isLite() ? '&lite=1' : '') + (isPhone() ? '&touch=1' : '');
+    var extraQ = isLite() ? '&lite=1' : '';
 
     if (free && web) {
       el.playerTip.innerHTML = 'Jogo grátis e legal, aberto direto do <b>site oficial</b> (' + free.autor + '). ' +
