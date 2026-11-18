@@ -6,6 +6,9 @@
 <title>Fliperama Retrô — acervo de clássicos no navegador</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="preconnect" href="https://cdn.emulatorjs.org" crossorigin>
+<link rel="preconnect" href="https://archive.org" crossorigin>
+<link rel="preconnect" href="https://cors.archive.org" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@400;500;600;700&family=Press+Start+2P&display=swap" rel="stylesheet">
 <style>
   :root {
@@ -574,6 +577,11 @@
 
   .card-fav:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
 
+  /* modo leve: nada de capas externas, renderização sob demanda */
+  body.lite .thumb img { display: none; }
+  body.lite .card { content-visibility: auto; contain-intrinsic-size: 250px; }
+  body.lite .card:hover .thumb img { transform: none; }
+
   .sentinel {
     height: 1px;
     margin-bottom: 40px;
@@ -612,6 +620,10 @@
   }
 
   .player[hidden] { display: none; }
+
+  body.fs-css .player { padding: 0; }
+  body.fs-css .player-shell { width: 100%; height: 100vh; height: 100dvh; border-radius: 0; border: 0; }
+  body.fs-css .player-head, body.fs-css .player-tip { display: none; }
 
   .player-shell {
     width: min(1220px, 100%);
@@ -676,6 +688,10 @@
   .icon-btn:hover, .fav-toggle:hover, .ext-link:hover { border-color: var(--accent); color: var(--text); }
 
   .fav-toggle svg { width: 14px; height: 14px; }
+
+  #playerFull svg { width: 14px; height: 14px; }
+
+  #playerFull.on { border-color: var(--accent); color: var(--accent); }
 
   .fav-toggle.on { color: #ffd166; border-color: rgba(255, 209, 102, 0.6); }
 
@@ -1073,9 +1089,11 @@
     .card-title { font-size: 12.5px; }
     .btn { padding: 0 13px; }
     .player { padding: 0; }
-    .player-shell { width: 100%; height: 100vh; border-radius: 0; border: 0; }
+    .player-shell { width: 100%; height: 100vh; height: 100dvh; border-radius: 0; border: 0; }
     .player-head { flex-wrap: wrap; }
     .player-head h2 { font-size: 14.5px; }
+    .player-actions { gap: 6px; }
+    .icon-btn, .fav-toggle, .ext-link, .close-btn { height: 42px; min-width: 42px; justify-content: center; padding: 0 10px; }
     .ext-link span { display: none; }
     .search-box kbd { display: none; }
     .search-box input { padding-right: 14px; }
@@ -1383,6 +1401,14 @@
           <input id="ctlPadUse" type="checkbox" checked>
           Usar controle USB/Bluetooth como teclas (desligue se o controle já responder sozinho dentro do emulador).
         </label>
+        <label class="ctl-check" style="margin-top:8px">
+          <input id="ctlLite" type="checkbox">
+          Modo leve (celular e internet fraca): esconde as capas do acervo e deixa o emulador mais leve.
+        </label>
+        <label class="ctl-check" style="margin-top:8px">
+          <input id="ctlFs" type="checkbox">
+          Abrir os jogos em tela cheia no celular (o botão <b>Tela cheia</b> continua no player).
+        </label>
         <p id="ctlPad" class="ctl-pad" style="margin:8px 0 0">Nenhum controle detectado.</p>
       </div>
       <span style="flex:1"></span>
@@ -1412,6 +1438,12 @@
         <p class="meta" id="playerMeta"></p>
       </div>
       <div class="player-actions">
+        <button id="playerFull" class="ext-link" type="button" title="Tela cheia">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"></path>
+          </svg>
+          <span>Tela cheia</span>
+        </button>
         <button id="playerKeys" class="ext-link" type="button" hidden>Teclas</button>
         <button id="playerMode" class="ext-link" type="button" hidden>Rodar no Archive</button>
         <button id="playerFav" class="fav-toggle" type="button" aria-pressed="false">
@@ -1445,6 +1477,7 @@
 
 <script src="jogos-data.js"></script>
 <script src="livres-data.js"></script>
+<script src="snes-extra-data.js"></script>
 <script>
 (function () {
   'use strict';
@@ -1475,8 +1508,68 @@
     creativision: '#8ce99a',
     aquarius: '#91a7ff',
     megaduck: '#ffc078',
-    nes: '#ff6b6b'
+    nes: '#ff6b6b',
+    web: '#63e6be'
   };
+
+  /* ---------- modo leve / tela cheia ---------- */
+
+  var LITE_KEY = 'fliperama-retro:modo-leve';
+  var FS_KEY = 'fliperama-retro:tela-cheia';
+
+  function isLite() {
+    try { return localStorage.getItem(LITE_KEY) === '1'; } catch (e) { return false; }
+  }
+
+  function autoFullscreen() {
+    try { return localStorage.getItem(FS_KEY) === '1'; } catch (e) { return false; }
+  }
+
+  function isPhone() {
+    try { return window.matchMedia('(pointer: coarse)').matches; } catch (e) { return false; }
+  }
+
+  function isFullscreen() {
+    return !!(document.fullscreenElement || document.webkitFullscreenElement);
+  }
+
+  function fsTarget() {
+    return document.querySelector('#player .player-shell') || document.getElementById('player');
+  }
+
+  function requestFullscreen() {
+    var t = fsTarget();
+    if (!t) return;
+    var fn = t.requestFullscreen || t.webkitRequestFullscreen;
+    if (!fn) {
+      document.body.classList.add('fs-css');
+      return;
+    }
+    try {
+      var p = fn.call(t, { navigationUI: 'hide' });
+      if (p && p.catch) p.catch(function () {});
+    } catch (e) {}
+  }
+
+  function exitFullscreen() {
+    if (document.body.classList.contains('fs-css')) {
+      document.body.classList.remove('fs-css');
+      return;
+    }
+    var fn = document.exitFullscreen || document.webkitExitFullscreen;
+    if (!fn || !isFullscreen()) return;
+    try {
+      var p = fn.call(document);
+      if (p && p.catch) p.catch(function () {});
+    } catch (e) {}
+  }
+
+  function toggleFullscreen() {
+    if (isFullscreen() || document.body.classList.contains('fs-css')) exitFullscreen();
+    else requestFullscreen();
+  }
+
+  if (isLite()) document.body.classList.add('lite');
 
   /* ---------- jogos grátis e homebrew (licença livre) ---------- */
 
@@ -1500,7 +1593,8 @@
     var extra = [];
     L.jogos.forEach(function (g) {
       var pi = index[g.plataforma];
-      if (pi === undefined || !g.url || !g.core) return;
+      if (pi === undefined || (!g.url && !g.web)) return;
+      if (!g.web && !g.core) return;
       var id = 'free:' + g.id;
       FREE[id] = g;
       PLAT[pi].n += 1;
@@ -1511,6 +1605,37 @@
     if (!extra.length) return;
     FREE_COUNT = extra.length;
     GAMES = extra.concat(GAMES);
+  })();
+
+  /* ---------- jogos de Super Nintendo que completam o Archive ---------- */
+
+  var MARCANTES = {};
+  var MARCANTES_COUNT = 0;
+  var ZIP_ONLY = {};
+
+  (function mergeSnesExtra() {
+    var X = window.SNES_EXTRA;
+    if (!X || !X.length) return;
+
+    var pi = -1;
+    var i;
+    for (i = 0; i < PLAT.length; i++) if (PLAT[i].id === 'snes') pi = i;
+    if (pi < 0) return;
+
+    var extra = [];
+    X.forEach(function (g) {
+      if (!g || !g.id || !g.titulo) return;
+      MARCANTES[g.id] = true;
+      if (g.zip) ZIP_ONLY[g.id] = true;
+      extra.push([g.id, g.titulo, g.ano || 0, pi]);
+      PLAT[pi].n += 1;
+      CAT.total += 1;
+    });
+
+    if (extra.length) {
+      MARCANTES_COUNT = extra.length;
+      GAMES = extra.concat(GAMES);
+    }
   })();
 
   var el = {
@@ -1541,6 +1666,7 @@
     playerFavLabel: document.getElementById('playerFavLabel'),
     playerKeys: document.getElementById('playerKeys'),
     playerMode: document.getElementById('playerMode'),
+    playerFull: document.getElementById('playerFull'),
     playerTip: document.getElementById('playerTip'),
     playerError: document.getElementById('playerError'),
     playerErrorText: document.getElementById('playerErrorText'),
@@ -1627,6 +1753,11 @@
     if (FREE_COUNT) {
       quickIds.free = true;
       el.chips.appendChild(chip('Grátis', FREE_COUNT, 'free', '#63e6be'));
+    }
+
+    if (MARCANTES_COUNT) {
+      quickIds.marcantes = true;
+      el.chips.appendChild(chip('Marcantes', MARCANTES_COUNT, 'marcantes', '#ffd43b'));
     }
 
     ['genesis', 'msdos', 'arcade', 'atari2600', 'snes'].forEach(function (id) {
@@ -1737,6 +1868,8 @@
       if (state.favOnly && !favs.has(g[0])) continue;
       if (state.platform === 'free') {
         if (!FREE[g[0]]) continue;
+      } else if (state.platform === 'marcantes') {
+        if (!MARCANTES[g[0]]) continue;
       } else if (state.platform !== 'all' && state.platform !== PLAT[g[3]].id) continue;
       if (q && keyOf(i).indexOf(q) === -1) continue;
       list.push(g);
@@ -1759,7 +1892,9 @@
       ? 'Mostrando seus favoritos'
       : state.platform === 'free'
         ? 'Homebrew grátis, com licença aberta, baixado do site dos autores'
-        : state.platform === 'all'
+        : state.platform === 'marcantes'
+          ? 'Grandes clássicos do Super Nintendo, direto do Internet Archive'
+          : state.platform === 'all'
           ? 'Clique em um jogo para abrir o player'
           : 'Plataforma: ' + PLAT.find(function (p) { return p.id === state.platform; }).nome;
     appendChunk();
@@ -1812,13 +1947,15 @@
       ph.textContent = initials(title);
       thumb.appendChild(ph);
 
-      var img = new Image();
-      img.loading = 'lazy';
-      img.decoding = 'async';
-      img.alt = '';
-      img.src = 'https://archive.org/services/img/' + encodeURIComponent(id);
-      img.addEventListener('error', function () { img.remove(); });
-      thumb.appendChild(img);
+      if (!isLite()) {
+        var img = new Image();
+        img.loading = 'lazy';
+        img.decoding = 'async';
+        img.alt = '';
+        img.src = 'https://archive.org/services/img/' + encodeURIComponent(id);
+        img.addEventListener('error', function () { img.remove(); });
+        thumb.appendChild(img);
+      }
     }
 
     var badge = document.createElement('span');
@@ -1972,6 +2109,7 @@
   var siteActive = false;
 
   function siteCfg(g) {
+    if (ZIP_ONLY[g[0]]) return null;
     return SITE_PLAT[g[3]] || null;
   }
 
@@ -1990,8 +2128,8 @@
     var free = FREE[g[0]];
     if (free) {
       el.playerLink.href = free.fonte;
-      el.playerLink.title = 'Licença ' + free.licenca + ' e fonte de ' + g[1];
-      el.playerLink.querySelector('span').textContent = 'Licença e fonte';
+      el.playerLink.title = (free.web ? 'Site oficial de ' : 'Licença ' + free.licenca + ' e fonte de ') + g[1];
+      el.playerLink.querySelector('span').textContent = free.web ? 'Site oficial' : 'Licença e fonte';
     } else {
       el.playerLink.href = 'https://archive.org/details/' + encodeURIComponent(g[0]);
       el.playerLink.title = 'Abrir ' + g[1] + ' no Internet Archive';
@@ -2001,13 +2139,15 @@
     document.body.style.overflow = 'hidden';
     syncPlayerFav();
     showGame(g);
+    if (autoFullscreen() && isPhone() && !isFullscreen()) requestFullscreen();
     el.closePlayer.focus();
   }
 
   function showGame(g) {
     var free = FREE[g[0]];
+    var web = !!(free && free.web);
     var cfg = free ? { core: free.core } : siteCfg(g);
-    var site = free ? true : (!!cfg && enginePref() !== 'archive');
+    var site = web ? false : (free ? true : (!!cfg && enginePref() !== 'archive'));
     siteActive = site;
     el.playerKeys.hidden = !site;
     el.playerMode.hidden = !cfg || !!free;
@@ -2017,26 +2157,38 @@
     el.frameLoadingText.textContent = 'Carregando o jogo…';
     el.frame.onload = null;
 
-    if (free) {
+    var extraQ = (isLite() ? '&lite=1' : '') + (isPhone() ? '&touch=1' : '');
+
+    if (free && web) {
+      el.playerTip.innerHTML = 'Jogo grátis e legal, aberto direto do <b>site oficial</b> (' + free.autor + '). ' +
+        'Clique dentro da tela para jogar. <kbd>Esc</kbd> fecha o player.';
+      el.frame.onload = function () {
+        el.frameLoading.classList.add('done');
+      };
+      el.frame.src = free.web;
+    } else if (free) {
       el.playerTip.innerHTML = 'Jogo grátis e legal (licença <b>' + free.licenca + '</b>), por ' + free.autor + '. ' +
         'Arquivo baixado do repositório oficial. Troque as teclas em <b>Teclas</b>. <kbd>Esc</kbd> fecha o jogo.';
       el.frame.src = 'siteplayer.html?src=' + encodeURIComponent(free.url) +
         '&core=' + encodeURIComponent(free.core) +
-        '&name=' + encodeURIComponent(g[1]);
+        '&name=' + encodeURIComponent(g[1]) + extraQ;
     } else if (site) {
       el.playerTip.innerHTML = 'Troque as teclas no botão <b>Teclas</b> — vale para todos os jogos do site. ' +
-        '<kbd>Esc</kbd> fecha o jogo. O controle USB/Bluetooth funciona direto no emulador ' +
-        '(menu de opções → Configurações do Controle).';
+        '<kbd>Esc</kbd> fecha o jogo. No celular aparecem os botões na tela; o controle USB/Bluetooth funciona ' +
+        'direto no emulador (menu de opções → Configurações do Controle).';
       el.frame.src = 'siteplayer.html?id=' + encodeURIComponent(g[0]) +
         '&core=' + encodeURIComponent(cfg.core) +
         '&name=' + encodeURIComponent(g[1]) +
-        (cfg.bios ? '&bios=' + encodeURIComponent(cfg.bios) : '');
+        (cfg.bios ? '&bios=' + encodeURIComponent(cfg.bios) : '') + extraQ;
     } else {
       el.playerTip.innerHTML = cfg
         ? 'Rodando no player do Archive: aqui as teclas são fixas. Use “Rodar no site” para poder trocar as teclas. ' +
           '<kbd>Esc</kbd> fecha o jogo.'
-        : 'Neste console o jogo roda no player do Archive e as teclas não podem ser trocadas. ' +
-          'Clique dentro da tela para usar o teclado. <kbd>Esc</kbd> fecha o jogo.';
+        : ZIP_ONLY[g[0]]
+          ? 'Este jogo só está disponível em .zip no Internet Archive, por isso roda no player do Archive ' +
+            '(teclas fixas). <kbd>Esc</kbd> fecha o jogo.'
+          : 'Neste console o jogo roda no player do Archive e as teclas não podem ser trocadas. ' +
+            'Clique dentro da tela para usar o teclado. <kbd>Esc</kbd> fecha o jogo.';
       el.frame.onload = function () {
         el.frameLoading.classList.add('done');
       };
@@ -2045,6 +2197,7 @@
   }
 
   function closePlayer() {
+    if (isFullscreen()) exitFullscreen();
     el.player.hidden = true;
     el.frame.onload = null;
     el.frame.src = 'about:blank';
@@ -2087,6 +2240,19 @@
 
   el.closePlayer.addEventListener('click', closePlayer);
 
+  function fsUi() {
+    var on = isFullscreen() || document.body.classList.contains('fs-css');
+    el.playerFull.classList.toggle('on', on);
+    el.playerFull.title = on ? 'Sair da tela cheia' : 'Tela cheia';
+    el.playerFull.querySelector('span').textContent = on ? 'Sair' : 'Tela cheia';
+  }
+
+  el.playerFull.addEventListener('click', function () {
+    toggleFullscreen();
+  });
+  document.addEventListener('fullscreenchange', fsUi);
+  document.addEventListener('webkitfullscreenchange', fsUi);
+
   el.player.addEventListener('click', function (e) {
     if (e.target === el.player) closePlayer();
   });
@@ -2094,6 +2260,10 @@
   document.addEventListener('keydown', function (e) {
     if (e.key === 'Escape' && !el.player.hidden) {
       e.preventDefault();
+      if (isFullscreen() || document.body.classList.contains('fs-css')) {
+        exitFullscreen();
+        return;
+      }
       closePlayer();
       return;
     }
@@ -2860,6 +3030,8 @@
   var ctlPadStatus = document.getElementById('ctlPad');
   var ctlPadUse = document.getElementById('ctlPadUse');
   var ctlPadRow = document.getElementById('ctlPadRow');
+  var ctlLite = document.getElementById('ctlLite');
+  var ctlFs = document.getElementById('ctlFs');
 
   var CTL_ACTIONS = [
     ['up', 'Cima'], ['down', 'Baixo'], ['left', 'Esquerda'], ['right', 'Direita'],
@@ -3172,6 +3344,19 @@
     try { localStorage.setItem(CTL_PAD_STORE, ctlPadUse.checked ? '1' : '0'); } catch (e) {}
     ctlPadPrev = {};
     ctlUpdatePad();
+  });
+
+  ctlLite.checked = isLite();
+  ctlFs.checked = autoFullscreen();
+
+  ctlLite.addEventListener('change', function () {
+    try { localStorage.setItem(LITE_KEY, ctlLite.checked ? '1' : '0'); } catch (e) {}
+    document.body.classList.toggle('lite', ctlLite.checked);
+    buildList();
+  });
+
+  ctlFs.addEventListener('change', function () {
+    try { localStorage.setItem(FS_KEY, ctlFs.checked ? '1' : '0'); } catch (e) {}
   });
 
   window.addEventListener('gamepadconnected', function () {

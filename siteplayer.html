@@ -28,6 +28,7 @@
   var gameName = params.get('name') || 'Jogo';
   var biosUrl = params.get('bios') || '';
   var directUrl = params.get('src') || '';
+  var lite = params.get('lite') === '1';
 
   /* Jogos grátis/homebrew: só baixamos do site oficial do autor, nunca de um espelho nosso. */
   var DIRECT_HOSTS = ['raw.githubusercontent.com', 'cdn.jsdelivr.net', 'github.io'];
@@ -247,6 +248,7 @@
     window.EJS_pathtodata = 'https://cdn.emulatorjs.org/stable/data/';
     window.EJS_startOnLoaded = true;
     window.EJS_language = 'pt-BR';
+    if (lite) window.EJS_defaultOptions = { shader: 'disabled' };
     if (biosUrl) window.EJS_biosUrl = biosUrl;
     window.EJS_onGameStart = function () {
       post({ type: 'flp-started' });
@@ -263,10 +265,12 @@
   }
 
   var CORES = {
-    nes: 1, snes: 1, gb: 1, gba: 1, n64: 1, nds: 1,
-    segaMD: 1, segaMS: 1, segaGG: 1,
-    atari2600: 1, atari7800: 1, pce: 1, ws: 1, ngp: 1, vb: 1, lynx: 1,
-    arcade: 1, psx: 1
+    nes: 1, fceumm: 1, snes: 1, snes9x: 1, bsnes: 1, gb: 1, gambatte: 1, gba: 1, mgba: 1,
+    n64: 1, nds: 1, melonds: 1,
+    segaMD: 1, genesis_plus_gx: 1, segaMS: 1, segaGG: 1, segaCD: 1, sega32x: 1,
+    atari2600: 1, stella2014: 1, atari7800: 1, prosystem: 1, atari5200: 1, a5200: 1,
+    pce: 1, mednafen_pce: 1, ws: 1, mednafen_wswan: 1, ngp: 1, vb: 1, beetle_vb: 1,
+    lynx: 1, handy: 1, arcade: 1, fbneo: 1, mame2003: 1, psx: 1, mednafen_psx: 1
   };
 
   if (!CORES[core]) {

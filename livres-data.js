@@ -5,9 +5,21 @@
    armazenada neste repositório. */
 window.LIVRES = {
   plataformas: [
-    { id: 'nes', nome: 'NES' }
+    { id: 'nes', nome: 'NES' },
+    { id: 'web', nome: 'Web' }
   ],
   jogos: [
+    {
+      id: 'minecraft-classic',
+      titulo: 'Minecraft Classic',
+      ano: 2009,
+      plataforma: 'web',
+      web: 'https://classic.minecraft.net/',
+      autor: 'Mojang',
+      licenca: 'Web',
+      fonte: 'https://classic.minecraft.net/',
+      desc: 'A versão clássica gratuita do Minecraft, jogada direto no navegador pelo site oficial da Mojang.'
+    },
     {
       id: 'minekart-madness',
       titulo: 'Minekart Madness',

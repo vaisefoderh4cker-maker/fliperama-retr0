@@ -1,21 +1,25 @@
 # Fliperama Retrô
 
-Página local para jogar clássicos no navegador: catálogo com **29.374 jogos** de **19 plataformas** (Arcade, MS-DOS, Mega Drive, Super Nintendo, NES, Atari 2600/5200/7800, TurboGrafx-16, ColecoVision, WonderSwan e mais), player do Internet Archive, **jogos grátis e homebrew com licença aberta**, aba de **Nintendo DS** e **Meus jogos** (arquivos seus de PS1, Nintendo 64, NES, SNES, Game Boy, GBA, Mega Drive…) e **sala online com código** para jogar junto.
+Página local para jogar clássicos no navegador: catálogo com **29.387 jogos** de **20 plataformas** (Arcade, MS-DOS, Mega Drive, Super Nintendo, NES, Atari 2600/5200/7800, TurboGrafx-16, ColecoVision, WonderSwan e mais), player do Internet Archive, **jogos grátis e homebrew com licença aberta**, **Minecraft Classic** no navegador, aba de **Nintendo DS** e **Meus jogos** (arquivos seus de PS1, Nintendo 64, NES, SNES, Game Boy, GBA, Mega Drive…) e **sala online com código** para jogar junto.
 
 Não é preciso instalar nada. Basta abrir no navegador (Chrome, Edge ou Firefox atualizados) e ter internet para o acervo.
 
 ## Recursos
 
-- **Acervo**: 29.374 jogos emulados na hora pelo Internet Archive, com capa, busca, filtro por plataforma, ordenação e favoritos.
-- **Jogos grátis (filtro Grátis)**: 5 jogos homebrew com licença aberta (MIT) — Minekart Madness, 2048, Falling (NES) e Cyloid, Pipes 2600 (Atari 2600) — que baixam o arquivo do repositório oficial do autor e rodam no site, com **Teclas** para trocar controles.
+- **Acervo**: 29.387 jogos emulados na hora pelo Internet Archive, com capa, busca, filtro por plataforma, ordenação e favoritos.
+- **Jogos grátis (filtro Grátis)**: 6 jogos gratuitos e legais — Minekart Madness, 2048, Falling (NES), Cyloid e Pipes 2600 (Atari 2600), com licença aberta (MIT), mais o **Minecraft Classic**, aberto do site oficial da Mojang, direto no navegador.
+- **Marcantes (chip Marcantes)**: 12 clássicos de Super Nintendo que completam o acervo — Street Fighter II, Top Gear, Worms, Pac-In-Time, The Lion King, Cool Spot, Soccer Kid, Speedy Gonzales, Mario Paint, Super Mario All-Stars + Super Mario World, Mega Man X 2 e Contra III: The Alien Wars (protótipo).
 - **Seleção de plataforma**: chips rápidos das plataformas mais usadas e o botão **Ver todas as plataformas**, que abre a lista completa agrupada por fabricante (Fliperama/PC, Nintendo, Sega, Atari, NEC, Bandai, Coleco e outras).
-- **Super Nintendo**: 211 títulos jogáveis direto na página.
+- **Super Nintendo**: 223 títulos jogáveis direto na página.
 - **Meus jogos**: rode no navegador os arquivos que você já tem — PlayStation 1, Nintendo 64, NES, SNES, Game Boy/GBC, Game Boy Advance, Mega Drive, Master System, Game Gear, Atari, PC Engine, Neo Geo Pocket, Virtual Boy e Arcade. Nada é enviado nem guardado (o arquivo só fica na memória da aba). Xbox e PlayStation 2 em diante não rodam no navegador.
 - **Nintendo DS**: você escolhe o seu arquivo `.nds`; o jogo roda no navegador com EmulatorJS e fica guardado apenas nele (IndexedDB).
 - **Sala online**: o anfitrião abre o jogo do próprio arquivo, recebe um **código de 6 caracteres** e transmite a tela para até 3 amigos, que controlam pelo teclado (estilo "Remote Play", conexão ponto a ponto).
 - **Teclas em qualquer jogo**: o botão **Teclas** troca cada tecla do jogo — vale para o Nintendo DS, a Sala online, a aba **Meus jogos**, os jogos **grátis** e **todos os jogos do acervo** que rodam no modo do site (Arcade, Mega Drive, Super Nintendo, Atari 2600/5200/7800, TurboGrafx-16, WonderSwan e Lynx).
 - **Modo do site / Archive**: no player, o botão alterna entre **Rodar no site** (emulador na própria página, com teclas trocáveis) e **Rodar no Archive** (player original do Internet Archive). A escolha fica salva. Plataformas sem core no site (MS-DOS, ColecoVision, Odyssey², Channel F, Super Cassette Vision, Astrocade, CreatiVision, Aquarius, Mega Duck) usam o Archive automaticamente.
 - **Controle USB/Bluetooth**: funciona como teclado no DS e na Sala online (inclusive no convidado); nos jogos do acervo em modo do site, o próprio emulador usa o controle direto.
+- **Controle de toque no celular**: no celular, o emulador mostra os botões na tela automaticamente (direcional + A/B/X/Y + Start/Select). Nada para instalar.
+- **Tela cheia**: o botão **Tela cheia** no topo do player ocupa a tela toda (e **Esc** sai da tela cheia antes de fechar o jogo). Em **Teclas** dá para marcar “Abrir os jogos em tela cheia no celular”.
+- **Modo leve (celular e internet fraca)**: em **Teclas**, marque **Modo leve** para esconder as capas do acervo (economiza milhares de downloads de imagem), desligar filtros de imagem do emulador e aliviar a renderização.
 
 ## Como abrir
 
@@ -57,7 +61,7 @@ Observações:
 
 ## Jogos grátis e homebrew (licença aberta)
 
-Na aba **Acervo**, a fileira de filtros tem o chip **Grátis** (também estão no topo da lista e na plataforma **NES**). São jogos feitos por fãs/desenvolvedores independentes e publicados com licença aberta, então podem ser baixados e jogados legalmente:
+Na aba **Acervo**, a fileira de filtros tem o chip **Grátis** (também estão no topo da lista e na plataforma **NES**). São jogos feitos por fãs/desenvolvedores independentes, publicados com licença aberta, e o Minecraft Classic, gratuito no site oficial da Mojang:
 
 | Jogo | Plataforma | Autor | Licença |
 | --- | --- | --- | --- |
@@ -66,10 +70,29 @@ Na aba **Acervo**, a fileira de filtros tem o chip **Grátis** (também estão n
 | Falling | NES | Jesse Williams (tragicmuffin) | MIT |
 | Cyloid | Atari 2600 | Keith Adler | MIT |
 | Pipes 2600 | Atari 2600 | Alexandre Brisighello (albf) | MIT |
+| Minecraft Classic | Web | Mojang | grátis no site oficial |
 
-Como jogar: clique no cartão → o jogo baixa o arquivo do repositório oficial do autor (GitHub via jsDelivr/raw) e abre no emulador da página. O rodapé do cartão mostra **Grátis · MIT** e o link **Licença e fonte** abre a página do projeto, com o texto da licença. O botão **Teclas** funciona normalmente.
+Como jogar: clique no cartão → o jogo baixa o arquivo do repositório oficial do autor (GitHub via jsDelivr/raw) e abre no emulador da página; o Minecraft Classic abre dentro do player, do site oficial da Mojang (precisa de internet e de um navegador atualizado). O rodapé do cartão mostra **Grátis · MIT** e o link **Licença e fonte** abre a página do projeto, com o texto da licença. O botão **Teclas** funciona nos jogos emulados.
 
 Critérios da lista: o jogo precisa ter o arquivo completo publicável, licença explícita (MIT) e um endereço oficial que permita download direto pelo navegador. Títulos sem licença clara ou hospedados só em páginas que bloqueiam download direto ficaram de fora. **O repositório guarda apenas os links e os créditos — nenhum arquivo de jogo.**
+
+## Marcantes do Super Nintendo
+
+O chip **Marcantes** reúne 12 clássicos que não estavam na lista original do Internet Archive. Todos são transmitidos do Archive (nenhuma ROM fica neste repositório):
+
+| Jogo | Jogo | Jogo |
+| --- | --- | --- |
+| Street Fighter II: The World Warrior | Top Gear | Worms |
+| Pac-In-Time | The Lion King | Cool Spot |
+| Soccer Kid | Speedy Gonzales | Mario Paint |
+| Super Mario All-Stars + Super Mario World | Mega Man X 2 | Contra III: The Alien Wars |
+
+Observações:
+
+- **Mega Man X 2** só existe em `.zip` no Archive, por isso roda no **player do Archive** (teclas fixas).
+- **Contra III** está disponível apenas como protótipo de revisão; o cartão avisa “(Protótipo)”.
+- **Metal Warriors**, **The Mask** e **Mega Man X** (o primeiro) não existem no acervo público do Internet Archive — sem arquivo lá, não há como incluir. Se você tem a cópia do seu cartucho, use a aba **Meus jogos** para rodar o seu arquivo `.sfc`.
+- Jogos comerciais de outras plataformas pedidos (Tatsunoko vs. Capcom, Super Meat Boy, Terraria) não podem entrar: são vendidos e protegidos por direitos autorais. O substituto legal é o **Minecraft Classic**, gratuito no site da Mojang e jogável no navegador.
 
 
 
@@ -138,6 +161,15 @@ Padrão: setas para direcional, `Z` (A), `X` (B), `A` (X), `S` (Y), `Q`/`E` (L/R
 - Se o controle já responder sozinho dentro do emulador e os comandos saírem duplicados, desmarque **“Usar controle USB/Bluetooth como teclas”**.
 - Controles precisam ser reconhecidos pelo navegador: aperte um botão com a página aberta; no Windows, verifique em `joy.cpl` se o controle aparece.
 
+### Jogar no celular (controle de toque)
+
+1. Abra o site no navegador do celular (Chrome, Edge ou Safari atualizados).
+2. Toque no jogo; no acervo, o modo do site abre o emulador com os **botões na tela** (direcional, A/B/X/Y, Start/Select).
+3. Toque em **Teclas** para marcar **“Abrir os jogos em tela cheia no celular”** e **“Modo leve”** (recomendado no 4G/3G).
+4. Gire o celular para a horizontal para a tela ficar maior. Para voltar, use **Esc** (ou o botão de voltar do navegador).
+
+Controle Bluetooth também funciona no celular: pareie o controle nas configurações do aparelho e ele é usado direto pelo emulador (menu de opções → **Configurações do Controle**, dentro do jogo).
+
 ## Estrutura
 
 ```
@@ -145,11 +177,12 @@ index.html          # o site (interface, busca, abas, player e sala online)
 siteplayer.html     # página do modo do site: emulador EmulatorJS + teclas trocáveis
 jogos-data.js       # catálogo gerado a partir de metadados do Internet Archive
 livres-data.js      # jogos grátis/homebrew com licença aberta (apenas links e créditos, sem ROMs)
+snes-extra-data.js  # clássicos de SNES do chip Marcantes (apenas ids do Archive)
 Abrir Fliperama.cmd # atalho do Windows para abrir o site
 ```
 
 ## Aviso legal
 
-Este projeto **não hospeda nem distribui jogos** — o repositório não contém ROMs, BIOS nem qualquer arquivo de jogo. O acervo apenas incorpora o player público do Internet Archive, ou, no modo do site, baixa o arquivo direto do Internet Archive pelo proxy oficial deles (`cors.archive.org`) e emula na própria página. Os **jogos grátis/homebrew** também não ficam aqui: o site baixa o arquivo do repositório oficial de cada autor (GitHub, via `cdn.jsdelivr.net`/`raw.githubusercontent.com`) no momento do uso, e o `livres-data.js` guarda somente endereço e créditos. As abas **Nintendo DS**, **Meus jogos** e **Sala online** executam somente arquivos fornecidos pelo próprio usuário, localmente no navegador — nada é enviado ou armazenado em servidor. Os catálogos comerciais de PlayStation, Xbox e Nintendo não são incluídos justamente por direitos autorais. Não inclua arquivos de jogos (ROMs) neste repositório.
+Este projeto **não hospeda nem distribui jogos** — o repositório não contém ROMs, BIOS nem qualquer arquivo de jogo. O acervo apenas incorpora o player público do Internet Archive, ou, no modo do site, baixa o arquivo direto do Internet Archive pelo proxy oficial deles (`cors.archive.org`) e emula na própria página. Os **jogos grátis/homebrew** também não ficam aqui: o site baixa o arquivo do repositório oficial de cada autor (GitHub, via `cdn.jsdelivr.net`/`raw.githubusercontent.com`) no momento do uso, e o `livres-data.js` guarda somente endereço e créditos. O **Minecraft Classic** é aberto do site oficial da Mojang dentro do player — o site não copia nem hospeda o jogo. As abas **Nintendo DS**, **Meus jogos** e **Sala online** executam somente arquivos fornecidos pelo próprio usuário, localmente no navegador — nada é enviado ou armazenado em servidor. Os catálogos comerciais de PlayStation, Xbox e Nintendo não são incluídos justamente por direitos autorais. Não inclua arquivos de jogos (ROMs) neste repositório.
 
 O código está disponível para uso pessoal; não há licença definida. Se quiser abrir o projeto, adicione uma licença (por exemplo, MIT).
